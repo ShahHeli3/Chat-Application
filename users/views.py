@@ -10,7 +10,7 @@ from users.forms import NewUserRegister
 class UserRegisterView(SuccessMessageMixin, CreateView):
     form_class = NewUserRegister
     template_name = 'users/register.html'
-    success_url = '../login/'
+    success_url = '/'
     success_message = "Your account has been successfully created! You can now login."
 
 
