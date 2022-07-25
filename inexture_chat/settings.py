@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-fb)mx-l^m6*chy8!1)bwd^it895qak48^*4i53ea!r&a4vg(-7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'inexture-chat.herokuapp.com']
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
