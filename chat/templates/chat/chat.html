@@ -1,0 +1,843 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+
+<!-- Mirrored from themesbrand.com/skote/layouts/chat.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 26 Aug 2021 05:23:31 GMT -->
+<head>
+
+    <meta charset="utf-8"/>
+    <title>Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description"/>
+    <meta content="Themesbrand" name="author"/>
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="{% static 'chat/images/favicon.ico' %}">
+
+    <!-- Bootstrap Css -->
+    <link href="{% static 'chat/css/bootstrap.min.css' %}" id="bootstrap-style" rel="stylesheet"/>
+    <!-- Icons Css -->
+    <link href="{% static 'chat/css/icons.min.css' %}" rel="stylesheet" type="text/css"/>
+    <!-- App Css-->
+    <link href="{% static 'chat/css/app.min.css' %}" id="app-style" rel="stylesheet"/>
+
+    <style>
+        .ui-widget-content {
+            position: absolute !important;
+            background: #556ee6;
+            color: white;
+            z-index: 1000;
+            list-style: none;
+            border-radius: 5px;
+        }
+        .ui-widget-content li {
+            font-size: 15px;
+            padding: 5px 0;
+        }
+    </style>
+</head>
+
+<body data-sidebar="dark">
+
+<!-- <body data-layout="horizontal" data-topbar="dark"> -->
+
+<!-- Begin page -->
+<div id="layout-wrapper">
+
+
+    <!-- ========== Left Sidebar Start ========== -->
+    <!--  -->            <!-- Left Sidebar End -->
+
+
+    <!-- ============================================================== -->
+    <!-- Start right Content here -->
+    <!-- ============================================================== -->
+
+    <div class="">
+
+        <div class="">
+            <div class="container-fluid">
+                <div class="d-lg-flex">
+                    <div class="chat-leftsidebar me-lg-4">
+                        <div class="">
+                            <div class="py-4 border-bottom">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0 align-self-center me-3">
+                                        <img src="{{ user.profile_image.url }}"
+                                             class="avatar-xs rounded-circle"
+                                             alt="">
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h5 class="font-size-15 mb-1">{{ user.full_name }}</h5>
+                                        <p class="text-muted mb-0"><i
+                                                class="mdi mdi-circle text-success align-middle me-1"></i> Active</p>
+                                    </div>
+
+                                    <div>
+                                        <div class="dropdown chat-noti-dropdown active">
+                                            <button class="btn" type="button" data-bs-toggle="dropdown"
+                                                    aria-haspopup="true" aria-expanded="false">
+                                                <i class="bx bx-bell bx-tada"></i>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-end">
+                                                <a class="dropdown-item" href="#">Action</a>
+                                                <a class="dropdown-item" href="#">Another action</a>
+                                                <a class="dropdown-item" href="#">Something else here</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="search-box chat-search-box py-4" style="display: flex">
+                                    <div class="position-relative" style="margin-right: 10px;">
+                                        <input type="text" class="form-control" placeholder="Search..." id="searchuser"
+                                               name="receiver">
+                                        <i class="bx bx-search-alt search-icon"></i>
+                                    </div>
+                                    <button id='btn-chat' class="btn" type="button"
+                                                style="background-color: #556ee6; color: white">Chat
+                                        </button>
+
+                                </div>
+
+
+                                <div class="chat-leftsidebar-nav">
+                                    <ul class="nav nav-pills nav-justified">
+                                        <li class="nav-item">
+                                            <a href="#chat" data-bs-toggle="tab" aria-expanded="true"
+                                               class="nav-link active">
+                                                <i class="bx bx-chat font-size-20 d-sm-none"></i>
+                                                <span class="d-none d-sm-block">Chat</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="#groups" data-bs-toggle="tab" aria-expanded="false"
+                                               class="nav-link">
+                                                <i class="bx bx-group font-size-20 d-sm-none"></i>
+                                                <span class="d-none d-sm-block">Groups</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="#contacts" data-bs-toggle="tab" aria-expanded="false"
+                                               class="nav-link">
+                                                <i class="bx bx-book-content font-size-20 d-sm-none"></i>
+                                                <span class="d-none d-sm-block">Contacts</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content py-4">
+                                        <div class="tab-pane show active" id="chat">
+                                            <div>
+                                                <h5 class="font-size-14 mb-3">Recent</h5>
+                                                <ul class="list-unstyled chat-list" data-simplebar
+                                                    style="max-height: 410px;">
+                                                    {% for room in rooms %}
+                                                        <li class="active" onclick="updateMessage('{{ room.receiver_user.username }}')">
+                                                            <a href="javascript: void(0);">
+                                                                <div class="d-flex">
+                                                                    <div class="flex-shrink-0 align-self-center me-3">
+                                                                        <i class="mdi mdi-circle font-size-10"></i>
+                                                                    </div>
+                                                                    <div class="flex-shrink-0 align-self-center me-3">
+                                                                        {% if room.sender_user == user %}
+                                                                            <img src="{{ room.receiver_user.profile_image.url }}"
+                                                                                 class="rounded-circle avatar-xs"
+                                                                                 alt="">
+                                                                        {% else %}
+                                                                            <img src="{{ room.sender_user.profile_image.url }}"
+                                                                                 class="rounded-circle avatar-xs"
+                                                                                 alt="">
+                                                                        {% endif %}
+                                                                    </div>
+
+                                                                    <div class="flex-grow-1 overflow-hidden">
+                                                                        <h5 class="text-truncate font-size-14 mb-1">
+                                                                            {% if room.sender_user == user %}
+                                                                                {{ room.receiver_user.first_name }}
+                                                                                {{ room.receiver_user.last_name }}
+                                                                            {% else %}
+                                                                                {{ room.sender_user.first_name }}
+                                                                                {{ room.sender_user.last_name }}
+                                                                            {% endif %}
+                                                                        </h5>
+                                                                    </div>
+                                                                </div>
+                                                            </a>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane" id="groups">
+                                            <h5 class="font-size-14 mb-3">Groups</h5>
+                                            <ul class="list-unstyled chat-list" data-simplebar
+                                                style="max-height: 410px;">
+                                                <li>
+                                                    <a href="javascript: void(0);">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="flex-shrink-0 me-3">
+                                                                <div class="avatar-xs">
+                                                                        <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">
+                                                                            G
+                                                                        </span>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="flex-grow-1">
+                                                                <h5 class="font-size-14 mb-0">General</h5>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+
+                                                <li>
+                                                    <a href="javascript: void(0);">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="flex-shrink-0 me-3">
+                                                                <div class="avatar-xs">
+                                                                        <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">
+                                                                            R
+                                                                        </span>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="flex-grow-1">
+                                                                <h5 class="font-size-14 mb-0">Reporting</h5>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+
+                                                <li>
+                                                    <a href="javascript: void(0);">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="flex-shrink-0 me-3">
+                                                                <div class="avatar-xs">
+                                                                        <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">
+                                                                            M
+                                                                        </span>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="flex-grow-1">
+                                                                <h5 class="font-size-14 mb-0">Meeting</h5>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+
+                                                <li>
+                                                    <a href="javascript: void(0);">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="flex-shrink-0 me-3">
+                                                                <div class="avatar-xs">
+                                                                        <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">
+                                                                            A
+                                                                        </span>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="flex-grow-1">
+                                                                <h5 class="font-size-14 mb-0">Project A</h5>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+
+                                                <li>
+                                                    <a href="javascript: void(0);">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="flex-shrink-0 me-3">
+                                                                <div class="avatar-xs">
+                                                                        <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">
+                                                                            B
+                                                                        </span>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="flex-grow-1">
+                                                                <h5 class="font-size-14 mb-0">Project B</h5>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <div class="tab-pane" id="contacts">
+                                            <h5 class="font-size-14 mb-3">Contacts</h5>
+
+                                            <div data-simplebar style="max-height: 410px;">
+                                                <div>
+                                                    <div class="avatar-xs mb-3">
+                                                            <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">
+                                                                A
+                                                            </span>
+                                                    </div>
+
+                                                    <ul class="list-unstyled chat-list">
+                                                        <li>
+                                                            <a href="javascript: void(0);">
+                                                                <h5 class="font-size-14 mb-0">Adam Miller</h5>
+                                                            </a>
+                                                        </li>
+
+                                                        <li>
+                                                            <a href="javascript: void(0);">
+                                                                <h5 class="font-size-14 mb-0">Alfonso Fisher</h5>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+
+                                                <div class="mt-4">
+                                                    <div class="avatar-xs mb-3">
+                                                            <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">
+                                                                B
+                                                            </span>
+                                                    </div>
+
+                                                    <ul class="list-unstyled chat-list">
+                                                        <li>
+                                                            <a href="javascript: void(0);">
+                                                                <h5 class="font-size-14 mb-0">Bonnie Harney</h5>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+
+                                                <div class="mt-4">
+                                                    <div class="avatar-xs mb-3">
+                                                            <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">
+                                                                C
+                                                            </span>
+                                                    </div>
+
+                                                    <ul class="list-unstyled chat-list">
+                                                        <li>
+                                                            <a href="javascript: void(0);">
+                                                                <h5 class="font-size-14 mb-0">Charles Brown</h5>
+                                                            </a>
+                                                            <a href="javascript: void(0);">
+                                                                <h5 class="font-size-14 mb-0">Carmella Jones</h5>
+                                                            </a>
+                                                            <a href="javascript: void(0);">
+                                                                <h5 class="font-size-14 mb-0">Carrie Williams</h5>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+
+                                                <div class="mt-4">
+                                                    <div class="avatar-xs mb-3">
+                                                            <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">
+                                                                D
+                                                            </span>
+                                                    </div>
+
+                                                    <ul class="list-unstyled chat-list">
+                                                        <li>
+                                                            <a href="javascript: void(0);">
+                                                                <h5 class="font-size-14 mb-0">Dolores Minter</h5>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                    <div class="w-100 user-chat">
+                        <div class="card">
+                            <div class="p-4 border-bottom ">
+                                <div class="row">
+                                    <div class="col-md-4 col-9">
+                                        <h5 class="font-size-15 mb-1" id="receiver_name">Steven Franklin</h5>
+                                        <p class="text-muted mb-0"><i
+                                                class="mdi mdi-circle text-success align-middle me-1"></i> Active now
+                                        </p>
+                                    </div>
+                                    <div class="col-md-8 col-3">
+                                        <ul class="list-inline user-chat-nav text-end mb-0">
+                                            <li class="list-inline-item d-none d-sm-inline-block">
+                                                <div class="dropdown">
+                                                    <button class="btn nav-btn dropdown-toggle" type="button"
+                                                            data-bs-toggle="dropdown" aria-haspopup="true"
+                                                            aria-expanded="false">
+                                                        <i class="bx bx-search-alt-2"></i>
+                                                    </button>
+                                                    <div class="dropdown-menu dropdown-menu-end dropdown-menu-md">
+                                                        <form class="p-3">
+                                                            {% csrf_token %}
+                                                            <div class="form-group m-0">
+                                                                <div class="input-group">
+                                                                    <input type="text" class="form-control"
+                                                                           placeholder="Search ..."
+                                                                           aria-label="Recipient's username">
+
+                                                                    <button class="btn btn-primary" type="submit"><i
+                                                                            class="mdi mdi-magnify"></i></button>
+
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="list-inline-item  d-none d-sm-inline-block">
+                                                <div class="dropdown">
+                                                    <button class="btn nav-btn dropdown-toggle" type="button"
+                                                            data-bs-toggle="dropdown" aria-haspopup="true"
+                                                            aria-expanded="false">
+                                                        <i class="bx bx-cog"></i>
+                                                    </button>
+                                                    <div class="dropdown-menu dropdown-menu-end">
+                                                        <a class="dropdown-item" href="#">View Profile</a>
+                                                        <a class="dropdown-item" href="#">Clear chat</a>
+                                                        <a class="dropdown-item" href="#">Muted</a>
+                                                        <a class="dropdown-item" href="#">Delete</a>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <li class="list-inline-item">
+                                                <div class="dropdown">
+                                                    <button class="btn nav-btn dropdown-toggle" type="button"
+                                                            data-bs-toggle="dropdown" aria-haspopup="true"
+                                                            aria-expanded="false">
+                                                        <i class="bx bx-dots-horizontal-rounded"></i>
+                                                    </button>
+                                                    <div class="dropdown-menu dropdown-menu-end">
+                                                        <a class="dropdown-item" href="#">Action</a>
+                                                        <a class="dropdown-item" href="#">Another action</a>
+                                                        <a class="dropdown-item" href="#">Something else</a>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div>
+                                <div class="chat-conversation p-3" id="chat-log" style="overflow-y: auto; max-height: 486px; min-height: 486px">
+                                    <ul class="list-unstyled mb-0" id="chat-messages" data-simplebar style="max-height: 486px;">
+                                        <li>
+                                            <div class="conversation-list">
+                                                <div class="ctext-wrap">
+                                                    <div class="conversation-name">Steven Franklin</div>
+                                                    <p>
+                                                        Hello!
+                                                    </p>
+                                                    <p class="chat-time mb-0"><i
+                                                            class="bx bx-time-five align-middle me-1"></i> 10:00</p>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                        <li class="right">
+                                            <div class="conversation-list">
+                                                <div class="ctext-wrap">
+                                                    <div class="conversation-name">Henry Wells</div>
+                                                    <p>
+                                                        Hi, How are you? What about our next meeting?
+                                                    </p>
+
+                                                    <p class="chat-time mb-0"><i
+                                                            class="bx bx-time-five align-middle me-1"></i> 10:02</p>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                        <li>
+                                            <div class="conversation-list">
+                                                <div class="ctext-wrap">
+                                                    <div class="conversation-name">Steven Franklin</div>
+                                                    <p>
+                                                        Yeah everything is fine
+                                                    </p>
+
+                                                    <p class="chat-time mb-0"><i
+                                                            class="bx bx-time-five align-middle me-1"></i> 10:06</p>
+                                                </div>
+
+                                            </div>
+                                        </li>
+
+                                        <li class="">
+                                            <div class="conversation-list">
+                                                <div class="dropdown">
+
+                                                    <a class="dropdown-toggle" href="#" role="button"
+                                                       data-bs-toggle="dropdown" aria-haspopup="true"
+                                                       aria-expanded="false">
+                                                        <i class="bx bx-dots-vertical-rounded"></i>
+                                                    </a>
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item" href="#">Copy</a>
+                                                        <a class="dropdown-item" href="#">Save</a>
+                                                        <a class="dropdown-item" href="#">Forward</a>
+                                                        <a class="dropdown-item" href="#">Delete</a>
+                                                    </div>
+                                                </div>
+                                                <div class="ctext-wrap">
+                                                    <div class="conversation-name">Steven Franklin</div>
+                                                    <p>& Next meeting tomorrow 10.00AM</p>
+                                                    <p class="chat-time mb-0"><i
+                                                            class="bx bx-time-five align-middle me-1"></i> 10:06</p>
+                                                </div>
+
+                                            </div>
+                                        </li>
+
+                                        <li class=" right">
+                                            <div class="conversation-list">
+                                                <div class="dropdown">
+
+                                                    <a class="dropdown-toggle" href="#" role="button"
+                                                       data-bs-toggle="dropdown" aria-haspopup="true"
+                                                       aria-expanded="false">
+                                                        <i class="bx bx-dots-vertical-rounded"></i>
+                                                    </a>
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item" href="#">Copy</a>
+                                                        <a class="dropdown-item" href="#">Save</a>
+                                                        <a class="dropdown-item" href="#">Forward</a>
+                                                        <a class="dropdown-item" href="#">Delete</a>
+                                                    </div>
+                                                </div>
+                                                <div class="ctext-wrap">
+                                                    <div class="conversation-name">Henry Wells</div>
+                                                    <p>
+                                                        Wow that's great
+                                                    </p>
+
+                                                    <p class="chat-time mb-0"><i
+                                                            class="bx bx-time-five align-middle me-1"></i> 10:07</p>
+                                                </div>
+                                            </div>
+                                        </li>
+
+
+                                    </ul>
+                                </div>
+                                <div class="p-3 chat-input-section">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="position-relative">
+                                                <input type="text" id="chat-message-input"
+                                                       class="form-control chat-input"
+                                                       placeholder="Enter Message...">
+                                                <div class="chat-input-links" id="tooltip-container">
+                                                    <ul class="list-inline mb-0">
+                                                        <li class="list-inline-item"><a href="javascript: void(0);"
+                                                                                        title="Emoji"><i
+                                                                class="mdi mdi-emoticon-happy-outline"></i></a></li>
+                                                        <li class="list-inline-item"><a href="javascript: void(0);"
+                                                                                        title="Images"><i
+                                                                class="mdi mdi-file-image-outline"></i></a></li>
+                                                        <li class="list-inline-item"><a href="javascript: void(0);"
+                                                                                        title="Add Files"><i
+                                                                class="mdi mdi-file-document-outline"></i></a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <button type="submit" id="chat-message-submit"
+                                                    class="btn btn-primary btn-rounded chat-send w-md waves-effect waves-light">
+                                                <span class="d-none d-sm-inline-block me-2">Send</span> <i
+                                                    class="mdi mdi-send"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- end row -->
+
+            </div> <!-- container-fluid -->
+        </div>
+        <!-- End Page-content -->
+
+
+    </div>
+    <!-- end main content-->
+
+</div>
+<!-- END layout-wrapper -->
+
+<!-- Right Sidebar -->
+<div class="right-bar">
+    <div data-simplebar class="h-100">
+        <div class="rightbar-title d-flex align-items-center px-3 py-4">
+
+            <h5 class="m-0 me-2">Settings</h5>
+
+            <a href="javascript:void(0);" class="right-bar-toggle ms-auto">
+                <i class="mdi mdi-close noti-icon"></i>
+            </a>
+        </div>
+
+        <!-- Settings -->
+        <hr class="mt-0"/>
+        <h6 class="text-center mb-0">Choose Layouts</h6>
+
+        <div class="p-4">
+            <div class="mb-2">
+                <img src="{% static 'chat/images/layouts/layout-1.jpg" class="img-thumbnail" alt="layout images' %}">
+            </div>
+
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input theme-choice" type="checkbox" id="light-mode-switch" checked>
+                <label class="form-check-label" for="light-mode-switch">Light Mode</label>
+            </div>
+
+            <div class="mb-2">
+                <img src="{% static 'chat/images/layouts/layout-2.jpg" class="img-thumbnail" alt="layout images' %}">
+            </div>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input theme-choice" type="checkbox" id="dark-mode-switch">
+                <label class="form-check-label" for="dark-mode-switch">Dark Mode</label>
+            </div>
+
+            <div class="mb-2">
+                <img src="{% static 'chat/images/layouts/layout-3.jpg" class="img-thumbnail" alt="layout images' %}">
+            </div>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input theme-choice" type="checkbox" id="rtl-mode-switch">
+                <label class="form-check-label" for="rtl-mode-switch">RTL Mode</label>
+            </div>
+
+            <div class="mb-2">
+                <img src="{% static 'chat/images/layouts/layout-4.jpg" class="img-thumbnail" alt="layout images' %}">
+            </div>
+            <div class="form-check form-switch mb-5">
+                <input class="form-check-input theme-choice" type="checkbox" id="dark-rtl-mode-switch">
+                <label class="form-check-label" for="dark-rtl-mode-switch">Dark RTL Mode</label>
+            </div>
+
+
+        </div>
+
+    </div> <!-- end slimscroll-menu-->
+</div>
+<!-- /Right-bar -->
+
+<!-- Right bar overlay-->
+<div class="rightbar-overlay"></div>
+
+<!-- JAVASCRIPT -->
+<script src="{% static 'chat/libs/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'chat/libs/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'chat/libs/metismenu/metisMenu.min.js' %}"></script>
+<script src="{% static 'chat/libs/simplebar/simplebar.min.js' %}"></script>
+<script src="{% static 'chat/libs/node-waves/waves.min.js' %}"></script>
+
+
+{#<script src="{% static 'chat/js/app.js' %}"></script>#}
+<script src='https://cdn.rawgit.com/pguso/jquery-plugin-circliful/master/js/jquery.circliful.min.js'></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+
+<script>
+
+    {# search user #}
+    var availableTags = [];
+
+    $.ajax({
+        method: "GET",
+        url: "/get_all_users",
+        success: function (response) {
+            console.log(response)
+            startAutoComplete(response)
+        }
+    })
+
+    function startAutoComplete(availableTags) {
+        $("#searchuser").autocomplete({
+            source: availableTags
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    {# create room #}
+    $('#btn-chat').click(function () {
+        {#console.log(window.CSRF_TOKEN)#}
+        var receiver = document.getElementById("searchuser").value;
+        console.log("receiver--->", receiver);
+        updateMessage(receiver)
+    });
+
+    function updateMessage(receiver) {
+        $.ajax(
+            {
+                method: "POST",
+                url: "/get_or_create_room",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                data: {
+                    "receiver": receiver,
+                },
+                success: function (data) {
+                    console.log(data)
+
+                    var roomName = data['room_name']
+
+                    $.ajax(
+                        {
+                            method: "GET",
+                            url: "/get_messages",
+                            data: {
+                                "room": roomName
+                            },
+                            success: function (d) {
+                                console.log("--------------->", d['json'][0])
+                                var receiver = d['receiver'];
+                                var receiver_user = d['receiver_user'];
+                                var sender_user = d['sender_user'];
+                                var sender_user_id = d['sender_user_id'];
+                                console.log("receiver", receiver_user)
+
+
+                                document.getElementById("receiver_name").innerText = receiver;
+                                document.getElementById("chat-messages").innerHTML = "";
+
+                                {#$("#chat-log").append("<ul class='list-unstyled mb-0' data-simplebar style='max-height: 486px;'>")#}
+
+                                for (let i = 0; i < d['json'].length; i++) {
+                                    console.log(d['json'][i])
+                                    if (receiver_user === d['json'][i]['username']) {
+                                        $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                                            d['json'][i]['full_name'] + "</div><p>" + d['json'][i]['message'] +
+                                            "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                                            d['json'][i]['timestamp'] + "</p></div></div></li>")
+                                    } else {
+                                        $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                                            d['json'][i]['full_name'] + "</div><p>" + d['json'][i]['message'] +
+                                            "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                                            d['json'][i]['timestamp'] + "</p></div></div></li>")
+                                    }
+                                }
+                                 $("#chat-messages").append("</ul>");
+                                chat(roomName, receiver_user, sender_user, sender_user_id)
+                            }
+                        }
+                    )
+                },
+            }
+        )
+    }
+
+    {# chat #}
+
+    function chat(roomName, receiver_user, sender_user, sender_user_id) {
+
+        $("#chat-log").scrollTop($("#chat-log")[0].scrollHeight);
+
+        const current_date = new Date();
+        const formatted = " " + current_date.toLocaleString('default', {month: 'long'}) + " " + current_date.getDate().toString()
+            + ", " + current_date.getFullYear().toString() + " " +
+            current_date.toLocaleString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            }).toLowerCase()
+
+        var chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+        );
+
+        chatSocket.onmessage = function (e) {
+            const data = JSON.parse(e.data);
+            console.log("-------------");
+            console.log(data);
+            console.log(sender_user)
+            console.log("-------------");
+
+
+            {# if the message sender is the logged in user #}
+            if (data.sender_user === sender_user) {
+                $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                    data.sender_user + "</div><p>" + data.message +
+                    "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                    formatted + "</p></div></div></li>")
+            } else {
+                $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                    data.sender_user + "</div><p>" + data.message +
+                    "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                    formatted + "</p></div></div></li>")
+            }
+            $("#chat-log").scrollTop($("#chat-log")[0].scrollHeight);
+
+        };
+
+        chatSocket.onclose = function (e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.querySelector('#chat-message-input').focus();
+        document.querySelector('#chat-message-input').onkeyup = function (e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function (e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+
+            if (message.trim().length !== 0) {
+                chatSocket.send(JSON.stringify({
+                    'message': message,
+                    'sender_user': sender_user,
+                    'sender_user_id': sender_user_id,
+                    'timestamp': formatted
+                }));
+                messageInputDom.value = '';
+            }
+        };
+    }
+
+
+</script>
+
+</body>
+
+<!-- Mirrored from themesbrand.com/skote/layouts/chat.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 26 Aug 2021 05:23:31 GMT -->
+</html>
