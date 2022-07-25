@@ -682,13 +682,26 @@
                 hour12: true
             }).toLowerCase()
 
-        var chatSocket = new WebSocket(
-            'ws://'
-            + window.location.host
-            + '/ws/chat/'
-            + roomName
-            + '/'
-        );
+
+        if (window.location.host === "inexture-chat.herokuapp.com") {
+            var chatSocket = new WebSocket(
+                'wss://'
+                + window.location.host
+                + '/ws/chat/'
+                + roomName
+                + '/'
+            );
+        }
+        if (window.location.host === "127.0.0.1:8000") {
+            var chatSocket = new WebSocket(
+                'ws://'
+                + window.location.host
+                + '/ws/chat/'
+                + roomName
+                + '/'
+            );
+        }
+
 
         chatSocket.onmessage = function (e) {
             const data = JSON.parse(e.data);
