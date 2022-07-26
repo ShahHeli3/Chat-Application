@@ -3,8 +3,10 @@ attrs==21.4.0
 autobahn==22.6.1
 Automat==20.2.0
 backports.zoneinfo==0.2.1
+certifi==2022.6.15
 cffi==1.15.1
 channels==3.0.5
+cloudinary==1.29.0
 constantly==15.1.0
 cryptography==37.0.4
 daphne==3.0.2
@@ -29,4 +31,5 @@ sqlparse==0.4.2
 Twisted==22.4.0
 txaio==22.2.1
 typing_extensions==4.3.0
+urllib3==1.26.11
 zope.interface==5.4.0

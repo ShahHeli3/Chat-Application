@@ -10,6 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -45,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'chat',
+    'cloudinary',
 ]
 
 MIDDLEWARE = [
@@ -153,3 +158,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 CSRF_TRUSTED_ORIGINS = ['https://inexture-chat.herokuapp.com']
+
+# adding config for cloudinary
+cloudinary.config(
+  cloud_name=os.environ.get('CLOUDNAME'),
+  api_key=os.environ.get('CLOUDINARY_API_KEY'),
+  api_secret=os.environ.get('CLOUDINARY_API_SECRET')
+)
