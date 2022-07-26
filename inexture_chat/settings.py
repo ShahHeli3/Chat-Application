@@ -22,7 +22,6 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
@@ -90,25 +89,24 @@ ASGI_APPLICATION = 'inexture_chat.asgi.application'
 
 # channel layer
 CHANNEL_LAYERS = {
-   "default": {
-       "BACKEND": "channels.layers.InMemoryChannelLayer"
-   }
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
 }
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-   'default': {
-       'ENGINE': 'django.db.backends.postgresql',
-       'NAME': os.environ.get('DB_NAME'),
-       'USER': os.environ.get('DB_USER'),
-       'PASSWORD': os.environ.get('DB_PASS'),
-       'HOST': os.environ.get('DB_HOST'),
-       'PORT': os.environ.get('DB_PORT'),
-   }
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASS'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
+    }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -128,7 +126,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
@@ -139,7 +136,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
@@ -161,7 +157,8 @@ CSRF_TRUSTED_ORIGINS = ['https://inexture-chat.herokuapp.com']
 
 # adding config for cloudinary
 cloudinary.config(
-  cloud_name=os.environ.get('CLOUDNAME'),
-  api_key=os.environ.get('CLOUDINARY_API_KEY'),
-  api_secret=os.environ.get('CLOUDINARY_API_SECRET')
+    cloud_name=os.environ.get('CLOUDNAME'),
+    api_key=os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
+    cloudinary_url=os.environ.get('CLOUDINARY_URL')
 )
