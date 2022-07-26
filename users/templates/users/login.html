@@ -1,11 +1,6 @@
 {% extends "users/base.html" %}
 {% load crispy_forms_tags%}
 {% block content %}
-    {% if messages %}
-        {% for message in messages %}
-            <br><h3>{{ message }}</h3>
-        {% endfor %}
-    {% endif %}
 	<br>
 	<div class="container">
 		<form method="POST" action="">
