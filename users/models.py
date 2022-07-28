@@ -3,7 +3,7 @@ from cloudinary.models import CloudinaryField
 
 
 class CustomUser(AbstractUser):
-    profile_image = CloudinaryField('image')
+    profile_image = CloudinaryField('image', folder='profiles')
 
     @property
     def full_name(self):
