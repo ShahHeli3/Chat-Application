@@ -30,6 +30,7 @@
             list-style: none;
             border-radius: 5px;
         }
+
         .ui-widget-content li {
             font-size: 15px;
             padding: 5px 0;
@@ -80,7 +81,8 @@
                                                 <i class="fas fa-bars"></i>
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-end">
-                                                <a class="dropdown-item" href="{% url 'profile' user.id %}">Update Profile</a>
+                                                <a class="dropdown-item" href="{% url 'profile' user.id %}">Update
+                                                    Profile</a>
                                                 <a class="dropdown-item" href="logout">Logout</a>
                                             </div>
                                         </div>
@@ -90,6 +92,7 @@
 
                             <form method="post">
                                 {% csrf_token %}
+                                <div id="search-bar-message"></div>
                                 <div class="search-box chat-search-box py-4" style="display: flex">
                                     <div class="position-relative" style="margin-right: 10px;">
                                         <input type="text" class="form-control" placeholder="Search..." id="searchuser"
@@ -97,8 +100,8 @@
                                         <i class="bx bx-search-alt search-icon"></i>
                                     </div>
                                     <button id='btn-chat' class="btn" type="button"
-                                                style="background-color: #556ee6; color: white">Chat
-                                        </button>
+                                            style="background-color: #556ee6; color: white">Chat
+                                    </button>
 
                                 </div>
 
@@ -135,41 +138,43 @@
                                                     style="max-height: 410px;">
                                                     {% for room in rooms %}
                                                         {% if room.sender_user == user %}
-                                                            <li class="active" onclick="updateMessage('{{ room.receiver_user.username }}')">
-                                                        {% else %}
-                                                            <li class="active" onclick="updateMessage('{{ room.sender_user.username }}')">
+                                                            <li class="active"
+                                                                onclick="updateMessage('{{ room.receiver_user.username }}')">
+                                                                {% else %}
+                                                            <li class="active"
+                                                                onclick="updateMessage('{{ room.sender_user.username }}')">
                                                         {% endif %}
-                                                            <a href="javascript: void(0);">
-                                                                <div class="d-flex">
-{#                                                                    <div class="flex-shrink-0 align-self-center me-3">#}
-{#                                                                        <i class="mdi mdi-circle font-size-10"></i>#}
-{#                                                                    </div>#}
-                                                                    <div class="flex-shrink-0 align-self-center me-3">
-                                                                        {% if room.sender_user == user %}
-                                                                            <img src="{{ room.receiver_user.profile_image.url }}"
-                                                                                 class="rounded-circle avatar-xs"
-                                                                                 alt="">
-                                                                        {% else %}
-                                                                            <img src="{{ room.sender_user.profile_image.url }}"
-                                                                                 class="rounded-circle avatar-xs"
-                                                                                 alt="">
-                                                                        {% endif %}
-                                                                    </div>
+                                                    <a href="javascript: void(0);">
+                                                        <div class="d-flex">
+                                                            {#                                                                    <div class="flex-shrink-0 align-self-center me-3">#}
+                                                            {#                                                                        <i class="mdi mdi-circle font-size-10"></i>#}
+                                                            {#                                                                    </div>#}
+                                                            <div class="flex-shrink-0 align-self-center me-3">
+                                                                {% if room.sender_user == user %}
+                                                                    <img src="{{ room.receiver_user.profile_image.url }}"
+                                                                         class="rounded-circle avatar-xs"
+                                                                         alt="">
+                                                                {% else %}
+                                                                    <img src="{{ room.sender_user.profile_image.url }}"
+                                                                         class="rounded-circle avatar-xs"
+                                                                         alt="">
+                                                                {% endif %}
+                                                            </div>
 
-                                                                    <div class="flex-grow-1 overflow-hidden">
-                                                                        <h5 class="text-truncate font-size-14 mb-1">
-                                                                            {% if room.sender_user == user %}
-                                                                                {{ room.receiver_user.first_name }}
-                                                                                {{ room.receiver_user.last_name }}
-                                                                            {% else %}
-                                                                                {{ room.sender_user.first_name }}
-                                                                                {{ room.sender_user.last_name }}
-                                                                            {% endif %}
-                                                                        </h5>
-                                                                    </div>
-                                                                </div>
-                                                            </a>
-                                                        </li>
+                                                            <div class="flex-grow-1 overflow-hidden">
+                                                                <h5 class="text-truncate font-size-14 mb-1">
+                                                                    {% if room.sender_user == user %}
+                                                                        {{ room.receiver_user.first_name }}
+                                                                        {{ room.receiver_user.last_name }}
+                                                                    {% else %}
+                                                                        {{ room.sender_user.first_name }}
+                                                                        {{ room.sender_user.last_name }}
+                                                                    {% endif %}
+                                                                </h5>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                    </li>
                                                     {% endfor %}
                                                 </ul>
                                             </div>
@@ -431,8 +436,10 @@
 
 
                             <div>
-                                <div class="chat-conversation p-3" id="chat-log" style="overflow-y: auto; max-height: 486px; min-height: 486px">
-                                    <ul class="list-unstyled mb-0" id="chat-messages" data-simplebar style="max-height: 486px;">
+                                <div class="chat-conversation p-3" id="chat-log"
+                                     style="overflow-y: auto; max-height: 486px; min-height: 486px">
+                                    <ul class="list-unstyled mb-0" id="chat-messages" data-simplebar
+                                        style="max-height: 486px;">
                                     </ul>
                                 </div>
                                 <div class="p-3 chat-input-section">
@@ -563,14 +570,13 @@
 
 <script>
 
-    {# search user #}
+    {#search user#}
     var availableTags = [];
 
     $.ajax({
         method: "GET",
         url: "/get_all_users",
         success: function (response) {
-            console.log(response)
             startAutoComplete(response)
         }
     })
@@ -597,11 +603,11 @@
         return cookieValue;
     }
 
-    {# create room #}
+    {#create#}
+    {#room#}
     $('#btn-chat').click(function () {
-        {#console.log(window.CSRF_TOKEN)#}
         var receiver = document.getElementById("searchuser").value;
-        console.log("receiver--->", receiver);
+        document.getElementById('search-bar-message').innerHTML = ''
         updateMessage(receiver)
     });
 
@@ -619,68 +625,57 @@
                     "receiver": receiver,
                 },
                 success: function (data) {
-                    console.log(data)
 
-                    var roomName = data['room_name']
+                    if (data['message']) {
+                        $("#search-bar-message").append('<h6>' + data['message'] + '</h6')
+                    } else {
+                        var roomName = data['room_name']
 
-                    $.ajax(
-                        {
-                            method: "GET",
-                            url: "/get_messages",
-                            data: {
-                                "room": roomName
-                            },
-                            success: function (d) {
-                                console.log("--------------->", d['json'][0])
-                                var receiver = d['receiver'];
-                                var receiver_user = d['receiver_user'];
-                                var sender_user = d['sender_user'];
-                                var sender_user_id = d['sender_user_id'];
-                                console.log("receiver", receiver_user)
+                        $.ajax(
+                            {
+                                method: "GET",
+                                url: "/get_messages",
+                                data: {
+                                    "room": roomName
+                                },
+                                success: function (d) {
+                                    var receiver = d['receiver'];
+                                    var receiver_user = d['receiver_user'];
+                                    var sender_user = d['sender_user'];
+                                    var sender_user_id = d['sender_user_id'];
 
+                                    document.getElementById("receiver_name").innerText = receiver;
+                                    document.getElementById("chat-messages").innerHTML = "";
 
-                                document.getElementById("receiver_name").innerText = receiver;
-                                document.getElementById("chat-messages").innerHTML = "";
-
-                                for (let i = 0; i < d['json'].length; i++) {
-                                    console.log(d['json'][i])
-                                    if (receiver_user === d['json'][i]['username']) {
-                                        $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                                            d['json'][i]['full_name'] + "</div><p>" + d['json'][i]['message'] +
-                                            "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
-                                            d['json'][i]['timestamp'] + "</p></div></div></li>")
-                                    } else {
-                                        $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                                            d['json'][i]['full_name'] + "</div><p>" + d['json'][i]['message'] +
-                                            "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
-                                            d['json'][i]['timestamp'] + "</p></div></div></li>")
+                                    for (let i = 0; i < d['json'].length; i++) {
+                                        if (receiver_user === d['json'][i]['username']) {
+                                            $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                                                d['json'][i]['full_name'] + "</div><p>" + d['json'][i]['message'] +
+                                                "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                                                d['json'][i]['timestamp'] + "</p></div></div></li>")
+                                        } else {
+                                            $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                                                d['json'][i]['full_name'] + "</div><p>" + d['json'][i]['message'] +
+                                                "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                                                d['json'][i]['timestamp'] + "</p></div></div></li>")
+                                        }
                                     }
+                                    $("#chat-messages").append("</ul>");
+                                    chat(roomName, receiver_user, sender_user, sender_user_id)
                                 }
-                                 $("#chat-messages").append("</ul>");
-                                chat(roomName, receiver_user, sender_user, sender_user_id)
                             }
-                        }
-                    )
+                        )
+                    }
                 },
             }
         )
     }
 
-    {# chat #}
+    {#chat#}
 
     function chat(roomName, receiver_user, sender_user, sender_user_id) {
 
         $("#chat-log").scrollTop($("#chat-log")[0].scrollHeight);
-
-        const current_date = new Date();
-        const formatted = " " + current_date.toLocaleString('default', {month: 'long'}) + " " + current_date.getDate().toString()
-            + ", " + current_date.getFullYear().toString() + " " +
-            current_date.toLocaleString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-            }).toLowerCase()
-
 
         if (window.location.host === "inexture-chat.herokuapp.com") {
             var chatSocket = new WebSocket(
@@ -706,11 +701,22 @@
             const data = JSON.parse(e.data);
             console.log("-------------");
             console.log(data);
-            console.log(sender_user)
             console.log("-------------");
 
+            var current_date = new Date();
+            var formatted = " " + current_date.toLocaleString('default', {month: 'long'}) + " " + current_date.getDate().toString()
+                + ", " + current_date.getFullYear().toString() + " " +
+                current_date.toLocaleString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                }).toLowerCase()
 
-            {# if the message sender is the logged in user #}
+            {#if the message#}
+            {#sender#}
+            {#is#}
+            {#the#}
+            {#logged in user#}
             if (data.sender_user === sender_user) {
                 $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
                     data.sender_user + "</div><p>" + data.message +
@@ -740,6 +746,15 @@
         document.querySelector('#chat-message-submit').onclick = function (e) {
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
+
+            var current_date = new Date();
+            var formatted = " " + current_date.toLocaleString('default', {month: 'long'}) + " " + current_date.getDate().toString()
+                + ", " + current_date.getFullYear().toString() + " " +
+                current_date.toLocaleString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                }).toLowerCase()
 
             if (message.trim().length !== 0) {
                 chatSocket.send(JSON.stringify({

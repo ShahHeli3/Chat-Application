@@ -32,14 +32,11 @@ class ChatConsumer(WebsocketConsumer):
     def save_message(self, message, timestamp, sender_user_id):
         sender_user = CustomUser.objects.get(id=sender_user_id)
         room = Room.objects.get(room_name=self.room_name)
-        print("--------------------------")
-        print(f"{sender_user}\n{room}\n{timestamp}\n{message}\n{sender_user_id}")
         new_message = Message.objects.create(sender_user=sender_user, room=room, message=message, timestamp=timestamp)
         new_message.save()
 
     # Receive message from WebSocket
     def receive(self, text_data):
-        print(f"RECEIVED {text_data}")
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
         sender_user = text_data_json['sender_user']
