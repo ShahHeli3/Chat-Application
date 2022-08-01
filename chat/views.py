@@ -98,6 +98,7 @@ def get_messages(request):
 
     receiver_user = message_receiver.username
     receiver = message_receiver.full_name
+    profile_image = str(message_receiver.profile_image)
 
     serializer = GetAllMessagesSerializer(Message.objects.filter(room=room).order_by('id'), many=True)
 
@@ -106,7 +107,8 @@ def get_messages(request):
         "sender_user": sender_user,
         "sender_user_id": sender_user_id,
         "receiver_user": receiver_user,
-        "receiver": receiver
+        "receiver": receiver,
+        "profile_image": profile_image
     }
     return JsonResponse(context)
 
@@ -138,7 +140,6 @@ def create_group(request):
 
     create_group = Group.objects.create(room=create_room, group_name=group_name, group_icon=group_icon)
     create_group.save()
-    request.session['group'] = create_group.id
 
     sender_obj = request.user
     add_member = GroupMembers.objects.create(group=create_group, user=sender_obj)
@@ -160,6 +161,7 @@ def get_group_messages(request):
     room_name = request.GET['room']
     room = Room.objects.get(room_name=room_name)
     sender_user_obj = request.user
+    group_icon = str(Group.objects.get(room=room).group_icon)
 
     serializer = GetAllMessagesSerializer(Message.objects.filter(room=room).order_by('id'), many=True)
 
@@ -167,6 +169,7 @@ def get_group_messages(request):
         "json": serializer.data,
         "sender_user_id": sender_user_obj.id,
         "sender_user": sender_user_obj.full_name,
+        "group_icon": group_icon,
     }
     return JsonResponse(context)
 

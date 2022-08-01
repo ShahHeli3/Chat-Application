@@ -345,70 +345,79 @@
                         <div class="card">
                             <div class="p-4 border-bottom ">
                                 <div class="row">
-                                    <div class="col-md-4 col-9">
-                                        <h5 class="font-size-15 mt-3" id="receiver_name"></h5>
-                                    </div>
-                                    <div class="col-md-8 col-3">
-                                        <ul class="list-inline user-chat-nav text-end mb-0">
-                                            <li class="list-inline-item d-none d-sm-inline-block">
-                                                <div class="dropdown">
-                                                    <button class="btn nav-btn dropdown-toggle" type="button"
-                                                            data-bs-toggle="dropdown" aria-haspopup="true"
-                                                            aria-expanded="false">
-                                                        <i class="bx bx-search-alt-2"></i>
-                                                    </button>
-                                                    <div class="dropdown-menu dropdown-menu-end dropdown-menu-md">
-                                                        <form class="p-3">
-                                                            {% csrf_token %}
-                                                            <div class="form-group m-0">
-                                                                <div class="input-group">
-                                                                    <input type="text" class="form-control"
-                                                                           placeholder="Search ..."
-                                                                           aria-label="Recipient's username">
 
-                                                                    <button class="btn btn-primary" type="submit"><i
-                                                                            class="mdi mdi-magnify"></i></button>
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0 align-self-center me-3">
+                                            <img src="" id="receiver-image" class="avatar-xs rounded-circle"
+                                                 alt="Image">
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h5 class="font-size-15 mt-3" id="receiver_name"></h5>
+                                        </div>
 
+                                        <div class="col-md-8 col-3">
+                                            <ul class="list-inline user-chat-nav text-end mb-0">
+                                                <li class="list-inline-item d-none d-sm-inline-block">
+                                                    <div class="dropdown">
+                                                        <button class="btn nav-btn dropdown-toggle" type="button"
+                                                                data-bs-toggle="dropdown" aria-haspopup="true"
+                                                                aria-expanded="false">
+                                                            <i class="bx bx-search-alt-2"></i>
+                                                        </button>
+                                                        <div class="dropdown-menu dropdown-menu-end dropdown-menu-md">
+                                                            <form class="p-3">
+                                                                {% csrf_token %}
+                                                                <div class="form-group m-0">
+                                                                    <div class="input-group">
+                                                                        <input type="text" class="form-control"
+                                                                               placeholder="Search ..."
+                                                                               aria-label="Recipient's username">
+
+                                                                        <button class="btn btn-primary" type="submit"><i
+                                                                                class="mdi mdi-magnify"></i></button>
+
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </form>
+                                                            </form>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </li>
-                                            <li class="list-inline-item  d-none d-sm-inline-block">
-                                                <div class="dropdown">
-                                                    <button class="btn nav-btn dropdown-toggle" type="button"
-                                                            data-bs-toggle="dropdown" aria-haspopup="true"
-                                                            aria-expanded="false">
-                                                        <i class="bx bx-cog"></i>
-                                                    </button>
-                                                    <div class="dropdown-menu dropdown-menu-end">
-                                                        <a class="dropdown-item" href="#">View Profile</a>
-                                                        <a class="dropdown-item" href="#">Clear chat</a>
-                                                        <a class="dropdown-item" href="#">Muted</a>
-                                                        <a class="dropdown-item" href="#">Delete</a>
+                                                </li>
+                                                <li class="list-inline-item  d-none d-sm-inline-block">
+                                                    <div class="dropdown">
+                                                        <button class="btn nav-btn dropdown-toggle" type="button"
+                                                                data-bs-toggle="dropdown" aria-haspopup="true"
+                                                                aria-expanded="false">
+                                                            <i class="bx bx-cog"></i>
+                                                        </button>
+                                                        <div class="dropdown-menu dropdown-menu-end">
+                                                            <a class="dropdown-item" href="#">View Profile</a>
+                                                            <a class="dropdown-item" href="#">Clear chat</a>
+                                                            <a class="dropdown-item" href="#">Muted</a>
+                                                            <a class="dropdown-item" href="#">Delete</a>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </li>
+                                                </li>
 
-                                            <li class="list-inline-item">
-                                                <div class="dropdown">
-                                                    <button class="btn nav-btn dropdown-toggle" type="button"
-                                                            data-bs-toggle="dropdown" aria-haspopup="true"
-                                                            aria-expanded="false">
-                                                        <i class="bx bx-dots-horizontal-rounded"></i>
-                                                    </button>
-                                                    <div class="dropdown-menu dropdown-menu-end">
-                                                        <a class="dropdown-item" href="#">Action</a>
-                                                        <a class="dropdown-item" href="#">Another action</a>
-                                                        <a class="dropdown-item" href="#">Something else</a>
+                                                <li class="list-inline-item">
+                                                    <div class="dropdown">
+                                                        <button class="btn nav-btn dropdown-toggle" type="button"
+                                                                data-bs-toggle="dropdown" aria-haspopup="true"
+                                                                aria-expanded="false">
+                                                            <i class="bx bx-dots-horizontal-rounded"></i>
+                                                        </button>
+                                                        <div class="dropdown-menu dropdown-menu-end">
+                                                            <a class="dropdown-item" href="#">Action</a>
+                                                            <a class="dropdown-item" href="#">Another action</a>
+                                                            <a class="dropdown-item" href="#">Something else</a>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </li>
+                                                </li>
 
-                                        </ul>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
+
                             </div>
 
 
@@ -622,8 +631,10 @@
                                     var receiver_user = d['receiver_user'];
                                     var sender_user = d['sender_user'];
                                     var sender_user_id = d['sender_user_id'];
+                                    var imageSource = 'https://res.cloudinary.com/dhhzjlge9/image/upload/v1659071861/' + d['profile_image'] + '.jpg'
 
                                     document.getElementById("receiver_name").innerText = receiver;
+                                    document.getElementById("receiver-image").src = imageSource;
                                     document.getElementById("chat-messages").innerHTML = "";
 
                                     for (let i = 0; i < d['json'].length; i++) {
@@ -678,9 +689,6 @@
 
         chatSocket.onmessage = function (e) {
             const data = JSON.parse(e.data);
-            console.log("-------------");
-            console.log(data);
-            console.log("-------------");
 
             var current_date = new Date();
             var formatted = " " + current_date.toLocaleString('default', {month: 'long'}) + " " + current_date.getDate().toString()
@@ -795,7 +803,6 @@
                         groupMembersList.push(member)
                         $("#group-members-list").append('<h5 class="font-size-12 mt-2">' + member + '</h5>')
                         document.getElementById('btn-create-group').style.display = 'block'
-                        console.log(groupMembersList)
                     }
                 } else {
                     $("#pre-group-name-div").append('<h5 class="font-size-15 mt-2">Please select a valid user!!</h5>')
@@ -857,7 +864,6 @@
         $('#chat').ariaExpanded = 'False';
         $('#groups').ariaExpanded = 'True'
 
-        console.log("room--->", room)
         $.ajax(
             {
                 method: "GET",
@@ -866,10 +872,12 @@
                     "room": room
                 },
                 success: function (response) {
+                    var imageSource = 'https://res.cloudinary.com/dhhzjlge9/image/upload/v1659348190/' + response['group_icon'] + '.jpg'
+                    document.getElementById("receiver-image").src = imageSource;
+
                     var sender_user_id = response['sender_user_id']
 
                     for (let i = 0; i < response['json'].length; i++) {
-                        console.log(response['json'][i])
                         if (sender_user_id === response['json'][i]['sender_user']) {
                             $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
                                 response['json'][i]['full_name'] + "</div><p>" + response['json'][i]['message'] +
