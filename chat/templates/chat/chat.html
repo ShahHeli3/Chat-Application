@@ -45,22 +45,13 @@
 <!-- Begin page -->
 <div id="layout-wrapper">
 
-
-    <!-- ========== Left Sidebar Start ========== -->
-    <!--  -->            <!-- Left Sidebar End -->
-
-
-    <!-- ============================================================== -->
-    <!-- Start right Content here -->
-    <!-- ============================================================== -->
-
     <div class="">
 
         <div class="">
             <div class="container-fluid">
                 <div class="d-lg-flex">
                     <div class="chat-leftsidebar me-lg-4">
-                        <div class="">
+                        <div class="" id="left-bar">
                             <div class="py-4 border-bottom">
                                 <div class="d-flex">
                                     <div class="flex-shrink-0 align-self-center me-3">
@@ -69,9 +60,7 @@
                                              alt="">
                                     </div>
                                     <div class="flex-grow-1">
-                                        <h5 class="font-size-15 mb-1">{{ user.full_name }}</h5>
-                                        <p class="text-muted mb-0"><i
-                                                class="mdi mdi-circle text-success align-middle me-1"></i> Active</p>
+                                        <h5 class="font-size-20 mt-2">{{ user.full_name }}</h5>
                                     </div>
 
                                     <div>
@@ -81,6 +70,8 @@
                                                 <i class="fas fa-bars"></i>
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-end">
+                                                <a class="dropdown-item" href="#" id="create-group"
+                                                   onclick="openCreateGroup()">Create Group</a>
                                                 <a class="dropdown-item" href="{% url 'profile' user.id %}">Update
                                                     Profile</a>
                                                 <a class="dropdown-item" href="logout">Logout</a>
@@ -122,13 +113,13 @@
                                                 <span class="d-none d-sm-block">Groups</span>
                                             </a>
                                         </li>
-                                        <li class="nav-item">
-                                            <a href="#contacts" data-bs-toggle="tab" aria-expanded="false"
-                                               class="nav-link">
-                                                <i class="bx bx-book-content font-size-20 d-sm-none"></i>
-                                                <span class="d-none d-sm-block">Contacts</span>
-                                            </a>
-                                        </li>
+                                        {#                                        <li class="nav-item">#}
+                                        {#                                            <a href="#contacts" data-bs-toggle="tab" aria-expanded="false"#}
+                                        {#                                               class="nav-link">#}
+                                        {#                                                <i class="bx bx-book-content font-size-20 d-sm-none"></i>#}
+                                        {#                                                <span class="d-none d-sm-block">Contacts</span>#}
+                                        {#                                            </a>#}
+                                        {#                                        </li>#}
                                     </ul>
                                     <div class="tab-content py-4">
                                         <div class="tab-pane show active" id="chat">
@@ -144,11 +135,9 @@
                                                             <li class="active"
                                                                 onclick="updateMessage('{{ room.sender_user.username }}')">
                                                         {% endif %}
+
                                                     <a href="javascript: void(0);">
                                                         <div class="d-flex">
-                                                            {#                                                                    <div class="flex-shrink-0 align-self-center me-3">#}
-                                                            {#                                                                        <i class="mdi mdi-circle font-size-10"></i>#}
-                                                            {#                                                                    </div>#}
                                                             <div class="flex-shrink-0 align-self-center me-3">
                                                                 {% if room.sender_user == user %}
                                                                     <img src="{{ room.receiver_user.profile_image.url }}"
@@ -184,184 +173,172 @@
                                             <h5 class="font-size-14 mb-3">Groups</h5>
                                             <ul class="list-unstyled chat-list" data-simplebar
                                                 style="max-height: 410px;">
-                                                <li>
-                                                    <a href="javascript: void(0);">
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0 me-3">
-                                                                <div class="avatar-xs">
-                                                                        <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">
-                                                                            G
-                                                                        </span>
+                                                {% for group in groups %}
+                                                    <li onclick="updateGroupChat('{{ group.group.room }}', '{{ group.group.group_name }}')">
+                                                        <a href="javascript: void(0);">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="flex-shrink-0 me-3">
+                                                                    <div class="avatar-xs">
+                                                                        <img src="{{ group.group.group_icon.url }}"
+                                                                             class="rounded-circle avatar-xs"
+                                                                             alt="">
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="flex-grow-1">
+                                                                    <h5 class="font-size-14 mb-0">{{ group.group }}</h5>
                                                                 </div>
                                                             </div>
-
-                                                            <div class="flex-grow-1">
-                                                                <h5 class="font-size-14 mb-0">General</h5>
-                                                            </div>
-                                                        </div>
-                                                    </a>
-                                                </li>
-
-                                                <li>
-                                                    <a href="javascript: void(0);">
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0 me-3">
-                                                                <div class="avatar-xs">
-                                                                        <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">
-                                                                            R
-                                                                        </span>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="flex-grow-1">
-                                                                <h5 class="font-size-14 mb-0">Reporting</h5>
-                                                            </div>
-                                                        </div>
-                                                    </a>
-                                                </li>
-
-                                                <li>
-                                                    <a href="javascript: void(0);">
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0 me-3">
-                                                                <div class="avatar-xs">
-                                                                        <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">
-                                                                            M
-                                                                        </span>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="flex-grow-1">
-                                                                <h5 class="font-size-14 mb-0">Meeting</h5>
-                                                            </div>
-                                                        </div>
-                                                    </a>
-                                                </li>
-
-                                                <li>
-                                                    <a href="javascript: void(0);">
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0 me-3">
-                                                                <div class="avatar-xs">
-                                                                        <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">
-                                                                            A
-                                                                        </span>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="flex-grow-1">
-                                                                <h5 class="font-size-14 mb-0">Project A</h5>
-                                                            </div>
-                                                        </div>
-                                                    </a>
-                                                </li>
-
-                                                <li>
-                                                    <a href="javascript: void(0);">
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="flex-shrink-0 me-3">
-                                                                <div class="avatar-xs">
-                                                                        <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">
-                                                                            B
-                                                                        </span>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="flex-grow-1">
-                                                                <h5 class="font-size-14 mb-0">Project B</h5>
-                                                            </div>
-                                                        </div>
-                                                    </a>
-                                                </li>
+                                                        </a>
+                                                    </li>
+                                                {% endfor %}
                                             </ul>
                                         </div>
 
-                                        <div class="tab-pane" id="contacts">
-                                            <h5 class="font-size-14 mb-3">Contacts</h5>
-
-                                            <div data-simplebar style="max-height: 410px;">
-                                                <div>
-                                                    <div class="avatar-xs mb-3">
-                                                            <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">
-                                                                A
-                                                            </span>
-                                                    </div>
-
-                                                    <ul class="list-unstyled chat-list">
-                                                        <li>
-                                                            <a href="javascript: void(0);">
-                                                                <h5 class="font-size-14 mb-0">Adam Miller</h5>
-                                                            </a>
-                                                        </li>
-
-                                                        <li>
-                                                            <a href="javascript: void(0);">
-                                                                <h5 class="font-size-14 mb-0">Alfonso Fisher</h5>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-
-                                                <div class="mt-4">
-                                                    <div class="avatar-xs mb-3">
-                                                            <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">
-                                                                B
-                                                            </span>
-                                                    </div>
-
-                                                    <ul class="list-unstyled chat-list">
-                                                        <li>
-                                                            <a href="javascript: void(0);">
-                                                                <h5 class="font-size-14 mb-0">Bonnie Harney</h5>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-
-                                                <div class="mt-4">
-                                                    <div class="avatar-xs mb-3">
-                                                            <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">
-                                                                C
-                                                            </span>
-                                                    </div>
-
-                                                    <ul class="list-unstyled chat-list">
-                                                        <li>
-                                                            <a href="javascript: void(0);">
-                                                                <h5 class="font-size-14 mb-0">Charles Brown</h5>
-                                                            </a>
-                                                            <a href="javascript: void(0);">
-                                                                <h5 class="font-size-14 mb-0">Carmella Jones</h5>
-                                                            </a>
-                                                            <a href="javascript: void(0);">
-                                                                <h5 class="font-size-14 mb-0">Carrie Williams</h5>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-
-                                                <div class="mt-4">
-                                                    <div class="avatar-xs mb-3">
-                                                            <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">
-                                                                D
-                                                            </span>
-                                                    </div>
-
-                                                    <ul class="list-unstyled chat-list">
-                                                        <li>
-                                                            <a href="javascript: void(0);">
-                                                                <h5 class="font-size-14 mb-0">Dolores Minter</h5>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-
-                                        </div>
+                                        {#                                        <div class="tab-pane" id="contacts">#}
+                                        {#                                            <h5 class="font-size-14 mb-3">Contacts</h5>#}
+                                        {##}
+                                        {#                                            <div data-simplebar style="max-height: 410px;">#}
+                                        {#                                                <div>#}
+                                        {#                                                    <div class="avatar-xs mb-3">#}
+                                        {#                                                            <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">#}
+                                        {#                                                                A#}
+                                        {#                                                            </span>#}
+                                        {#                                                    </div>#}
+                                        {##}
+                                        {#                                                    <ul class="list-unstyled chat-list">#}
+                                        {#                                                        <li>#}
+                                        {#                                                            <a href="javascript: void(0);">#}
+                                        {#                                                                <h5 class="font-size-14 mb-0">Adam Miller</h5>#}
+                                        {#                                                            </a>#}
+                                        {#                                                        </li>#}
+                                        {##}
+                                        {#                                                        <li>#}
+                                        {#                                                            <a href="javascript: void(0);">#}
+                                        {#                                                                <h5 class="font-size-14 mb-0">Alfonso Fisher</h5>#}
+                                        {#                                                            </a>#}
+                                        {#                                                        </li>#}
+                                        {#                                                    </ul>#}
+                                        {#                                                </div>#}
+                                        {##}
+                                        {#                                                <div class="mt-4">#}
+                                        {#                                                    <div class="avatar-xs mb-3">#}
+                                        {#                                                            <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">#}
+                                        {#                                                                B#}
+                                        {#                                                            </span>#}
+                                        {#                                                    </div>#}
+                                        {##}
+                                        {#                                                    <ul class="list-unstyled chat-list">#}
+                                        {#                                                        <li>#}
+                                        {#                                                            <a href="javascript: void(0);">#}
+                                        {#                                                                <h5 class="font-size-14 mb-0">Bonnie Harney</h5>#}
+                                        {#                                                            </a>#}
+                                        {#                                                        </li>#}
+                                        {#                                                    </ul>#}
+                                        {#                                                </div>#}
+                                        {##}
+                                        {#                                                <div class="mt-4">#}
+                                        {#                                                    <div class="avatar-xs mb-3">#}
+                                        {#                                                            <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">#}
+                                        {#                                                                C#}
+                                        {#                                                            </span>#}
+                                        {#                                                    </div>#}
+                                        {##}
+                                        {#                                                    <ul class="list-unstyled chat-list">#}
+                                        {#                                                        <li>#}
+                                        {#                                                            <a href="javascript: void(0);">#}
+                                        {#                                                                <h5 class="font-size-14 mb-0">Charles Brown</h5>#}
+                                        {#                                                            </a>#}
+                                        {#                                                            <a href="javascript: void(0);">#}
+                                        {#                                                                <h5 class="font-size-14 mb-0">Carmella Jones</h5>#}
+                                        {#                                                            </a>#}
+                                        {#                                                            <a href="javascript: void(0);">#}
+                                        {#                                                                <h5 class="font-size-14 mb-0">Carrie Williams</h5>#}
+                                        {#                                                            </a>#}
+                                        {#                                                        </li>#}
+                                        {#                                                    </ul>#}
+                                        {#                                                </div>#}
+                                        {##}
+                                        {#                                                <div class="mt-4">#}
+                                        {#                                                    <div class="avatar-xs mb-3">#}
+                                        {#                                                            <span class="avatar-title rounded-circle bg-primary bg-soft text-primary">#}
+                                        {#                                                                D#}
+                                        {#                                                            </span>#}
+                                        {#                                                    </div>#}
+                                        {##}
+                                        {#                                                    <ul class="list-unstyled chat-list">#}
+                                        {#                                                        <li>#}
+                                        {#                                                            <a href="javascript: void(0);">#}
+                                        {#                                                                <h5 class="font-size-14 mb-0">Dolores Minter</h5>#}
+                                        {#                                                            </a>#}
+                                        {#                                                        </li>#}
+                                        {#                                                    </ul>#}
+                                        {#                                                </div>#}
+                                        {#                                            </div>#}
+                                        {##}
+                                        {#                                        </div>#}
                                     </div>
                                 </div>
 
                             </form>
+                        </div>
+
+                        <div id="left-bar-create-group" style="display: none">
+                            <div class="py-4 border-bottom">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0 align-self-center me-3">
+                                        <img src="{{ user.profile_image.url }}"
+                                             class="avatar-xs rounded-circle"
+                                             alt="">
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h5 class="font-size-20 mt-2">{{ user.full_name }}</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="pre-group-name-div"></div>
+                            <div class="flex-grow-1">
+                                <h5 class="font-size-15 mt-2">Group Name:</h5>
+                            </div>
+                            <div class="search-box group-user-search-box py-4" style="display: flex">
+                                <div class="position-relative">
+                                    <input type="text" class="form-control" placeholder="Enter Group Name"
+                                           id="group-name"
+                                           name="">
+                                </div>
+
+
+                            </div>
+                            <div class="flex-grow-1">
+                                <h5 class="font-size-15 mt-2">Add Group Icon</h5>
+                            </div>
+                            <br>
+                            <div id="add-group-icon">
+                                <input type="button" type="button" onclick="addImage()" id="group-icon-id"
+                                       value="Add Image">
+                            </div>
+
+                            <br><br><br>
+                            <div class="flex-grow-1">
+                                <h5 class="font-size-15 mt-2">Add Participants</h5>
+                            </div>
+                            <div id="group-members-list"></div>
+                            <div class="search-box chat-search-box py-4" style="display: flex">
+                                <div class="position-relative" style="margin-right: 10px;">
+                                    <input type="text" class="form-control" placeholder="Enter username"
+                                           id="group-member" name="">
+                                    <i class="bx bx-search-alt search-icon"></i>
+                                </div>
+                                <button id='add-group-member-btn' class="btn" type="button" onclick="allowCreateGroup()"
+                                        style="background-color: #556ee6; color: white">Add
+                                </button>
+
+                            </div>
+                            <button id='btn-create-group' class="btn" type="button" onclick="createGroup()"
+                                    style="background-color: #556ee6; color: white; margin-left: 60px; display: none">
+                                Create Group
+                            </button>
+
                         </div>
                     </div>
                     <div class="w-100 user-chat" id="user-chat" style="display: none">
@@ -562,16 +539,18 @@
 
 
 {#<script src="{% static 'chat/js/app.js' %}"></script>#}
-<script src='https://cdn.rawgit.com/pguso/jquery-plugin-circliful/master/js/jquery.circliful.min.js'></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+<script src='https://cdn.rawgit.com/pguso/jquery-plugin-circliful/master/js/jquery.circliful.min.js'></script>
+<script src='https://cdn.jsdelivr.net/jquery.cloudinary/1.0.18/jquery.cloudinary.js' type='text/javascript'></script>
+<script src="//widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 
 
 <script>
 
     {#search user#}
-    var availableTags = [];
+    var availableUsers = [];
 
     $.ajax({
         method: "GET",
@@ -581,9 +560,9 @@
         }
     })
 
-    function startAutoComplete(availableTags) {
+    function startAutoComplete(availableUsers) {
         $("#searchuser").autocomplete({
-            source: availableTags
+            source: availableUsers
         });
     }
 
@@ -661,7 +640,7 @@
                                         }
                                     }
                                     $("#chat-messages").append("</ul>");
-                                    chat(roomName, receiver_user, sender_user, sender_user_id)
+                                    chat(roomName, sender_user, sender_user_id)
                                 }
                             }
                         )
@@ -673,7 +652,7 @@
 
     {#chat#}
 
-    function chat(roomName, receiver_user, sender_user, sender_user_id) {
+    function chat(roomName, sender_user, sender_user_id) {
 
         $("#chat-log").scrollTop($("#chat-log")[0].scrollHeight);
 
@@ -766,6 +745,150 @@
                 messageInputDom.value = '';
             }
         };
+    }
+
+
+    var availableTags = [];
+    var groupMembersList = [];
+    var groupName = '';
+
+    function openCreateGroup() {
+        document.getElementById('left-bar').style.display = 'none'
+        document.getElementById('left-bar-create-group').style.display = 'block'
+
+        $.ajax({
+            method: "GET",
+            url: "/get_all_users_for_group_creation",
+            success: function (response) {
+                startAutoComplete(response)
+                availableTags = response
+            }
+        })
+
+        function startAutoComplete(availableTags) {
+            $("#group-member").autocomplete({
+                source: availableTags
+            });
+        }
+    }
+
+
+    function allowCreateGroup() {
+        document.getElementById('pre-group-name-div').innerHTML = ''
+
+        groupName = document.getElementById('group-name').value
+
+        if (groupName.trim().length === 0) {
+            $("#pre-group-name-div").append('<h5 class="font-size-15 mt-2">Please enter a group name!!</h5>')
+        } else {
+            var member = document.getElementById('group-member').value
+
+
+            if (member.trim().length === 0) {
+                $("#pre-group-name-div").append('<h5 class="font-size-15 mt-2">Please enter a username!!</h5>')
+            } else {
+                document.getElementById('group-member').value = ''
+                if (availableTags.includes(member)) {
+                    if (groupMembersList.includes(member)) {
+                        $("#pre-group-name-div").append('<h5 class="font-size-15 mt-2">User already selected!</h5>')
+                    } else {
+                        groupMembersList.push(member)
+                        $("#group-members-list").append('<h5 class="font-size-12 mt-2">' + member + '</h5>')
+                        document.getElementById('btn-create-group').style.display = 'block'
+                        console.log(groupMembersList)
+                    }
+                } else {
+                    $("#pre-group-name-div").append('<h5 class="font-size-15 mt-2">Please select a valid user!!</h5>')
+                }
+            }
+        }
+    }
+
+    var imageID = ''
+
+    function addImage() {
+        $.cloudinary.config({cloud_name: 'dhhzjlge9', api_key: '675879341691844'});
+        cloudinary.openUploadWidget({
+                cloud_name: 'dhhzjlge9',
+                upload_preset: 'ygrmgnvy',
+                tags: ['cgal']
+            },
+            function (error, result) {
+                if (error) console.log(error);
+                // If NO error, log image data to console
+                imageID = result[0].public_id;
+                $('#add-group-icon').append(imageID)
+            });
+    }
+
+    function createGroup() {
+
+        $.ajax({
+            url: '/create_group',
+            method: 'POST',
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken")
+            },
+            data: {
+                'group_icon': imageID,
+                'group_name': groupName,
+                'group_members': groupMembersList,
+            },
+            success: function (response) {
+                var roomName = response['room_name']
+
+                updateGroupChat(roomName, groupName)
+
+            }
+        })
+    }
+
+    function updateGroupChat(room, group) {
+
+        document.getElementById('home-image').style.display = 'none'
+        document.getElementById('user-chat').style.display = 'block'
+        document.getElementById("receiver_name").innerText = group
+        document.getElementById("chat-messages").innerHTML = "";
+
+        document.getElementById('left-bar').style.display = 'block'
+        document.getElementById('left-bar-create-group').style.display = 'none'
+        $('#chat').removeClass('active');
+        $('#groups').addClass('active');
+        $('#chat').ariaExpanded = 'False';
+        $('#groups').ariaExpanded = 'True'
+
+        console.log("room--->", room)
+        $.ajax(
+            {
+                method: "GET",
+                url: "/get_group_messages",
+                data: {
+                    "room": room
+                },
+                success: function (response) {
+                    var sender_user_id = response['sender_user_id']
+
+                    for (let i = 0; i < response['json'].length; i++) {
+                        console.log(response['json'][i])
+                        if (sender_user_id === response['json'][i]['sender_user']) {
+                            $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                                response['json'][i]['full_name'] + "</div><p>" + response['json'][i]['message'] +
+                                "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                                response['json'][i]['timestamp'] + "</p></div></div></li>")
+
+                        } else {
+                            $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                                response['json'][i]['full_name'] + "</div><p>" + response['json'][i]['message'] +
+                                "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                                response['json'][i]['timestamp'] + "</p></div></div></li>")
+                        }
+                    }
+                    $("#chat-messages").append("</ul>");
+
+                    chat(room, response['sender_user'], sender_user_id)
+
+                }
+            })
     }
 
 

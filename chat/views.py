@@ -1,9 +1,11 @@
+import json
+
 from django.db.models import Q
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.utils.crypto import get_random_string
 
-from chat.models import Room, Message, PersonalRoom
+from chat.models import Room, Message, PersonalRoom, Group, GroupMembers
 from chat.serializer import GetAllMessagesSerializer
 from users.models import CustomUser
 
@@ -11,7 +13,8 @@ from users.models import CustomUser
 def home(request):
     users = CustomUser.objects.all()
     rooms = PersonalRoom.objects.filter(Q(sender_user=request.user) | Q(receiver_user=request.user))
-    context = {'users': users, 'rooms': rooms}
+    groups = GroupMembers.objects.filter(user=request.user)
+    context = {'users': users, 'rooms': rooms, 'groups': groups}
     return render(request, 'chat/chat.html', context=context)
 
 
@@ -106,3 +109,68 @@ def get_messages(request):
         "receiver": receiver
     }
     return JsonResponse(context)
+
+
+def get_all_users_for_group_creation(request):
+    current_user = request.user.id
+    get_users = CustomUser.objects.exclude(id=current_user).values_list('username', flat=True)
+    users_list = list(get_users)
+    return JsonResponse(users_list, safe=False)
+
+
+def create_group(request):
+    group_name = request.POST['group_name']
+    group_icon = request.POST['group_icon']
+    group_members_list = request.POST.getlist('group_members[]')
+
+    group_room = get_random_string(10)
+
+    while True:
+        room_exists = Room.objects.filter(room_name=group_room)
+        if room_exists:
+            group_room = get_random_string(10)
+        else:
+            break
+
+    create_room = Room.objects.create(room_name=group_room)
+    create_room.save()
+    room_name = create_room.room_name
+
+    create_group = Group.objects.create(room=create_room, group_name=group_name, group_icon=group_icon)
+    create_group.save()
+    request.session['group'] = create_group.id
+
+    sender_obj = request.user
+    add_member = GroupMembers.objects.create(group=create_group, user=sender_obj)
+    add_member.save()
+
+    for member in group_members_list:
+        new_member = CustomUser.objects.get(username=member)
+        add_new_member = GroupMembers.objects.create(group=create_group, user=new_member)
+        add_new_member.save()
+
+    context = {
+        'sender': sender_obj.full_name,
+        'room_name': room_name
+    }
+    return JsonResponse(context)
+
+
+def get_group_messages(request):
+    room_name = request.GET['room']
+    room = Room.objects.get(room_name=room_name)
+    sender_user_obj = request.user
+
+    serializer = GetAllMessagesSerializer(Message.objects.filter(room=room).order_by('id'), many=True)
+
+    context = {
+        "json": serializer.data,
+        "sender_user_id": sender_user_obj.id,
+        "sender_user": sender_user_obj.full_name,
+    }
+    return JsonResponse(context)
+
+
+
+
+

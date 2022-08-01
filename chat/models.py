@@ -1,3 +1,5 @@
+from cloudinary.models import CloudinaryField
+
 from users.models import CustomUser
 
 from django.contrib.auth.models import User, AnonymousUser
@@ -30,6 +32,7 @@ class Group(models.Model):
     """
     room = models.ForeignKey(Room, related_name='room', on_delete=models.CASCADE)
     group_name = models.CharField(max_length=25, blank=False, null=False)
+    group_icon = CloudinaryField('image', folder='group_icons', default='')
 
     def __str__(self):
         return self.group_name
