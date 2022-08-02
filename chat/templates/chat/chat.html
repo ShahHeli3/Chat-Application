@@ -85,13 +85,19 @@
                                 {% csrf_token %}
                                 <div id="search-bar-message"></div>
                                 <div class="search-box chat-search-box py-4" style="display: flex">
-                                    <div class="position-relative" style="margin-right: 10px;">
+                                    <div class="position-relative" style="margin-right: 10px; ">
                                         <input type="text" class="form-control" placeholder="Search..." id="searchuser"
                                                name="receiver">
+                                        <input type="text" class="form-control" placeholder="Search groups..."
+                                               id="search-group" style="display: none">
                                         <i class="bx bx-search-alt search-icon"></i>
                                     </div>
+
                                     <button id='btn-chat' class="btn" type="button"
                                             style="background-color: #556ee6; color: white">Chat
+                                    </button>
+                                    <button id='btn-open-group' class="btn" type="button"
+                                            style="background-color: #556ee6; color: white; display: none">Open
                                     </button>
 
                                 </div>
@@ -107,7 +113,7 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="#groups" data-bs-toggle="tab" aria-expanded="false"
+                                            <a href="#groups" data-bs-toggle="tab" aria-expanded="false" id="group-chat"
                                                class="nav-link">
                                                 <i class="bx bx-group font-size-20 d-sm-none"></i>
                                                 <span class="d-none d-sm-block">Groups</span>
@@ -340,7 +346,12 @@
                             </button>
 
                         </div>
+
+                        <div id="left-bar-group-info" style="display: none">
+                            group info
+                        </div>
                     </div>
+
                     <div class="w-100 user-chat" id="user-chat" style="display: none">
                         <div class="card">
                             <div class="p-4 border-bottom ">
@@ -382,33 +393,33 @@
                                                         </div>
                                                     </div>
                                                 </li>
-                                                <li class="list-inline-item  d-none d-sm-inline-block">
-                                                    <div class="dropdown">
-                                                        <button class="btn nav-btn dropdown-toggle" type="button"
-                                                                data-bs-toggle="dropdown" aria-haspopup="true"
-                                                                aria-expanded="false">
-                                                            <i class="bx bx-cog"></i>
-                                                        </button>
-                                                        <div class="dropdown-menu dropdown-menu-end">
-                                                            <a class="dropdown-item" href="#">View Profile</a>
-                                                            <a class="dropdown-item" href="#">Clear chat</a>
-                                                            <a class="dropdown-item" href="#">Muted</a>
-                                                            <a class="dropdown-item" href="#">Delete</a>
-                                                        </div>
-                                                    </div>
-                                                </li>
+                                                {#                                                <li class="list-inline-item  d-none d-sm-inline-block">#}
+                                                {#                                                    <div class="dropdown">#}
+                                                {#                                                        <button class="btn nav-btn dropdown-toggle" type="button"#}
+                                                {#                                                                data-bs-toggle="dropdown" aria-haspopup="true"#}
+                                                {#                                                                aria-expanded="false">#}
+                                                {#                                                            <i class="bx bx-cog"></i>#}
+                                                {#                                                        </button>#}
+                                                {#                                                        <div class="dropdown-menu dropdown-menu-end">#}
+                                                {#                                                            <a class="dropdown-item" href="#">View Profile</a>#}
+                                                {#                                                            <a class="dropdown-item" href="#">Clear chat</a>#}
+                                                {#                                                            <a class="dropdown-item" href="#">Muted</a>#}
+                                                {#                                                            <a class="dropdown-item" href="#">Delete</a>#}
+                                                {#                                                        </div>#}
+                                                {#                                                    </div>#}
+                                                {#                                                </li>#}
 
                                                 <li class="list-inline-item">
-                                                    <div class="dropdown">
+                                                    <div class="dropdown" id="more-features" style="display: none">
                                                         <button class="btn nav-btn dropdown-toggle" type="button"
                                                                 data-bs-toggle="dropdown" aria-haspopup="true"
                                                                 aria-expanded="false">
                                                             <i class="bx bx-dots-horizontal-rounded"></i>
                                                         </button>
                                                         <div class="dropdown-menu dropdown-menu-end">
-                                                            <a class="dropdown-item" href="#">Action</a>
-                                                            <a class="dropdown-item" href="#">Another action</a>
-                                                            <a class="dropdown-item" href="#">Something else</a>
+                                                            <a class="dropdown-item" href="#" onclick="groupInfo()">Group Info</a>
+                                                            <a class="dropdown-item" href="#">Leave Group</a>
+{#                                                            <a class="dropdown-item" href="#">Something else</a>#}
                                                         </div>
                                                     </div>
                                                 </li>
@@ -560,6 +571,55 @@
 
     {#search user#}
     var availableUsers = [];
+    var availableGroups = [];
+    var allGroups = [];
+
+    $('#group-chat').click(function () {
+        document.getElementById('searchuser').style.display = 'none'
+        document.getElementById('search-group').style.display = 'block'
+
+        document.getElementById('btn-chat').style.display = 'none'
+        document.getElementById('btn-open-group').style.display = 'block'
+
+        $.ajax({
+            method: "GET",
+            url: "/get_all_groups",
+            success: function (response) {
+                allGroups = response
+                startAutoComplete(response)
+            }
+        })
+
+        function startAutoComplete(availableGroups) {
+            $("#search-group").autocomplete({
+                source: availableGroups
+            });
+        }
+    })
+
+    $('#btn-open-group').click(function () {
+        var group_name = document.getElementById('search-group').value;
+        document.getElementById('search-bar-message').innerHTML = ''
+
+        if (allGroups.includes(group_name)) {
+
+            $.ajax({
+                method: 'GET',
+                url: '/get_room_from_group_name',
+                data: {
+                    'group': group_name
+                },
+                success: function (response) {
+                    var room = response['room']
+                    updateGroupChat(room, group_name)
+                }
+            })
+
+        } else {
+            $('#search-bar-message').append(('<h6> No such group exists.<br>Select an existing group or create a new group</h6>'))
+        }
+    })
+
 
     $.ajax({
         method: "GET",
@@ -568,12 +628,6 @@
             startAutoComplete(response)
         }
     })
-
-    function startAutoComplete(availableUsers) {
-        $("#searchuser").autocomplete({
-            source: availableUsers
-        });
-    }
 
     function getCookie(name) {
         let cookieValue = null;
@@ -589,6 +643,12 @@
             }
         }
         return cookieValue;
+    }
+
+    function startAutoComplete(availableUsers) {
+        $("#searchuser").autocomplete({
+            source: availableUsers
+        });
     }
 
     {#create#}
@@ -859,6 +919,9 @@
 
         document.getElementById('left-bar').style.display = 'block'
         document.getElementById('left-bar-create-group').style.display = 'none'
+
+        document.getElementById('more-features').style.display = 'block'
+
         $('#chat').removeClass('active');
         $('#groups').addClass('active');
         $('#chat').ariaExpanded = 'False';
@@ -897,6 +960,12 @@
 
                 }
             })
+    }
+
+    function groupInfo(){
+        document.getElementById('left-bar-create-group').style.display = 'none'
+        document.getElementById('left-bar').style.display = 'none'
+        document.getElementById('left-bar-group-info').style.display = 'block'
     }
 
 

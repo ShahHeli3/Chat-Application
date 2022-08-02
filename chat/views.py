@@ -22,9 +22,13 @@ def get_users_ajax(request):
     """
     function to get all the users for suggesstions while searching
     """
-    get_users = CustomUser.objects.filter(is_active=True).values_list('username', flat=True)
-    users_list = list(get_users)
-    return JsonResponse(users_list, safe=False)
+    get_users = list(CustomUser.objects.filter(is_active=True).values_list('username', flat=True))
+    return JsonResponse(get_users, safe=False)
+
+
+def get_all_groups_ajax(request):
+    get_groups = list(GroupMembers.objects.filter(user=request.user).values_list('group__group_name', flat=True))
+    return JsonResponse(get_groups, safe=False)
 
 
 def get_or_create_room(request):
@@ -174,6 +178,7 @@ def get_group_messages(request):
     return JsonResponse(context)
 
 
-
-
-
+def get_room_from_group_name_ajax(request):
+    group_name = request.GET['group']
+    user_group = GroupMembers.objects.get(user=request.user, group__group_name=group_name)
+    return JsonResponse({'room': user_group.group.room.room_name})
