@@ -1,7 +1,5 @@
-import json
-
 from django.db.models import Q
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.crypto import get_random_string
 
@@ -11,6 +9,10 @@ from users.models import CustomUser
 
 
 def home(request):
+    """
+    function to load all users, the logged-in user's rooms and send it to frontend
+    :return: rooms, users
+    """
     users = CustomUser.objects.all()
     rooms = PersonalRoom.objects.filter(Q(sender_user=request.user) | Q(receiver_user=request.user))
     groups = GroupMembers.objects.filter(user=request.user)
@@ -20,13 +22,16 @@ def home(request):
 
 def get_users_ajax(request):
     """
-    function to get all the users for suggesstions while searching
+    function to get all the users for suggestions while searching
     """
     get_users = list(CustomUser.objects.filter(is_active=True).values_list('username', flat=True))
     return JsonResponse(get_users, safe=False)
 
 
 def get_all_groups_ajax(request):
+    """
+    function to get all the groups of logged-in user for suggestions while searching
+    """
     get_groups = list(GroupMembers.objects.filter(user=request.user).values_list('group__group_name', flat=True))
     return JsonResponse(get_groups, safe=False)
 
@@ -118,6 +123,9 @@ def get_messages(request):
 
 
 def get_all_users_for_group_creation(request):
+    """
+    function to get all the users except for logged-in user for suggestions while group creation
+    """
     current_user = request.user.id
     get_users = CustomUser.objects.exclude(id=current_user).values_list('username', flat=True)
     users_list = list(get_users)
@@ -125,9 +133,16 @@ def get_all_users_for_group_creation(request):
 
 
 def create_group(request):
+    """
+    to create group
+    """
     group_name = request.POST['group_name']
     group_icon = request.POST['group_icon']
     group_members_list = request.POST.getlist('group_members[]')
+
+    # if user has not selected any group icon then set default
+    if not group_icon:
+        group_icon = 'group/blij1remmmq0i33fnirp'
 
     group_room = get_random_string(10)
 
@@ -138,13 +153,17 @@ def create_group(request):
         else:
             break
 
+    # create room
     create_room = Room.objects.create(room_name=group_room)
     create_room.save()
     room_name = create_room.room_name
 
+    # create group
     create_group = Group.objects.create(room=create_room, group_name=group_name, group_icon=group_icon)
     create_group.save()
+    request.session['group_id'] = create_group.id
 
+    # add members
     sender_obj = request.user
     add_member = GroupMembers.objects.create(group=create_group, user=sender_obj)
     add_member.save()
@@ -162,6 +181,9 @@ def create_group(request):
 
 
 def get_group_messages(request):
+    """
+    to get previous messages of the group
+    """
     room_name = request.GET['room']
     room = Room.objects.get(room_name=room_name)
     sender_user_obj = request.user
@@ -179,6 +201,90 @@ def get_group_messages(request):
 
 
 def get_room_from_group_name_ajax(request):
+    """
+    to get room name from the group name
+    """
     group_name = request.GET['group']
     user_group = GroupMembers.objects.get(user=request.user, group__group_name=group_name)
     return JsonResponse({'room': user_group.group.room.room_name})
+
+
+def change_group_name(request):
+    """
+    to update the group name
+    """
+    group_name = request.POST['old_name']
+    new_name = request.POST['name']
+
+    if new_name == group_name:
+        return JsonResponse({'status': False})
+
+    group = GroupMembers.objects.get(group__group_name=group_name, user=request.user).group_id
+    Group.objects.filter(id=group).update(group_name=new_name)
+    return JsonResponse({'status': True})
+
+
+def update_group_icon(request):
+    """
+    to update the group icon
+    """
+    group_name = request.POST['group_name']
+    icon = request.POST['image_url']
+    group = GroupMembers.objects.get(group__group_name=group_name, user=request.user).group_id
+    Group.objects.filter(id=group).update(group_icon=icon)
+    return JsonResponse({'message': 'Group Icon Updated'})
+
+
+def exit_group(request):
+    """
+    to leave the group
+    """
+    group_name = request.POST['group_name']
+    group_member = GroupMembers.objects.get(group__group_name=group_name, user=request.user)
+    group_room_id = group_member.group.room.id
+    group_member.delete()
+    return JsonResponse({'room': group_room_id})
+
+
+def get_group_members(request):
+    """
+    to get existing group members
+    """
+    group_name = request.GET['group_name']
+    group = GroupMembers.objects.get(group__group_name=group_name, user=request.user).group
+    group_members = GroupMembers.objects.filter(group=group)
+    group_members_list = [group_member.user.full_name for group_member in group_members]
+    return JsonResponse(group_members_list, safe=False)
+
+
+def get_users_except_group_members(request):
+    """
+    to get users other than group members for suggestions while adding members
+    """
+    group_name = request.GET['group_name']
+    group = GroupMembers.objects.get(group__group_name=group_name, user=request.user).group
+    group_members = list(GroupMembers.objects.filter(group=group).values_list('user__username', flat=True))
+    users = list(CustomUser.objects.all().values_list('username', flat=True))
+    available_users = [i for i in users if i not in group_members]
+
+    return JsonResponse(available_users, safe=False)
+
+
+def add_group_members(request):
+    """
+    to add group members
+    """
+    group_name = request.POST['group_name']
+    group_members_list = request.POST.getlist('members[]')
+
+    group = GroupMembers.objects.get(user=request.user, group__group_name=group_name).group
+
+    members_list = []
+
+    for member in group_members_list:
+        user = CustomUser.objects.get(username=member)
+        member_name = user.full_name
+        members_list.append(member_name)
+        GroupMembers.objects.create(group=group, user=user)
+
+    return JsonResponse(members_list, safe=False)
