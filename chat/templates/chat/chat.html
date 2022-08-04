@@ -423,8 +423,9 @@
                                                         <li class="list-inline-item"><a href="javascript: void(0);"
                                                                                         title="Emoji"><i
                                                                 class="mdi mdi-emoticon-happy-outline"></i></a></li>
-                                                        <li class="list-inline-item"><a href="javascript: void(0);"
-                                                                                        title="Images"><i
+                                                        <li class="list-inline-item" id="send-image-file"><a
+                                                                href="javascript: void(0);"
+                                                                title="Images"><i
                                                                 class="mdi mdi-file-image-outline"></i></a></li>
                                                         <li class="list-inline-item"><a href="javascript: void(0);"
                                                                                         title="Add Files"><i
@@ -858,7 +859,15 @@
             function (error, result) {
                 if (error) console.log(error);
                 // If NO error, log image data to console
-                imageID = result[0].public_id;
+
+                if (result[0].format !== 'jpg' && result[0].format !== 'png') {
+                    Swal.fire({
+                        title: 'Invalid image format',
+                        confirmButtonText: 'OK',
+                    })
+                }
+
+                imageID = result[0].secure_url;
                 $('#add-group-icon').append(imageID)
             });
     }
@@ -909,8 +918,7 @@
                     "room": room
                 },
                 success: function (response) {
-                    var imageSource = 'https://res.cloudinary.com/dhhzjlge9/image/upload/v1659348190/' + response['group_icon'] + '.jpg'
-                    document.getElementById("receiver-image").src = imageSource;
+                    document.getElementById("receiver-image").src = response['group_icon'];
 
                     var sender_user_id = response['sender_user_id']
 
@@ -1063,8 +1071,14 @@
             function (error, result) {
                 if (error) console.log(error);
                 // If NO error, log image data to console
-                imageID = result[0].public_id;
-                {#$('#group-icon').append(imageID)#}
+               if (result[0].format !== 'jpg' && result[0].format !== 'png') {
+                    Swal.fire({
+                        title: 'Invalid image format',
+                        confirmButtonText: 'OK',
+                    })
+                }
+
+                imageID = result[0].secure_url;
 
                 $.ajax({
                     method: "POST",
@@ -1078,8 +1092,8 @@
                     },
                     success: function (response) {
                         document.getElementById('group-info-message').innerHTML = ''
-                        $('#group-info-message').append(('<h6> Group Icon Updated</h6>'))
-                        document.getElementById("receiver-image").src = 'https://res.cloudinary.com/dhhzjlge9/image/upload/v1659348190/' + imageID + '.jpg'
+                        $('#group-info-message').append(('<h6>' + response['message'] + '</h6>'))
+                        document.getElementById("receiver-image").src = imageID
                     }
                 })
             }
@@ -1134,6 +1148,45 @@
         })
     });
 
+    $("#send-image-file").click(function () {
+        $.cloudinary.config({cloud_name: 'dhhzjlge9', api_key: '675879341691844'});
+        cloudinary.openUploadWidget({
+                cloud_name: 'dhhzjlge9',
+                upload_preset: 'g5lmd3i3',
+                tags: ['cgal']
+            },
+            function (error, result) {
+                if (error) console.log(error);
+                // If NO error, log image data to console
+
+                if (result[0].format !== 'jpg' && result[0].format !== 'png') {
+                    Swal.fire({
+                        title: 'Invalid image format',
+                        confirmButtonText: 'OK',
+                    })
+                } else {
+                    var url = result[0].secure_url
+                    console.log(url)
+                }
+
+
+                {#  save to database  #}
+                {#$.ajax({#}
+                {#    method: "POST",#}
+                {#    url: "/save_image_to_db",#}
+                {#    headers: {#}
+                {#        "X-CSRFToken": getCookie("csrftoken")#}
+                {#    },#}
+                {#    data: {#}
+                {#        'image': imageID,#}
+                {#    },#}
+                {#    success: function(response){#}
+                {#        console.log(response)#}
+                {#    }#}
+                {##}
+            }
+        )
+    })
 
 </script>
 

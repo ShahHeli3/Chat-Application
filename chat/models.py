@@ -54,3 +54,11 @@ class Message(models.Model):
     room = models.ForeignKey(Room, related_name='message_room', on_delete=models.CASCADE)
     message = models.TextField()
     timestamp = models.CharField(max_length=100)
+
+
+# class ImageShared(models.Model):
+#     """
+#     model for storing imaged shared in chat
+#     """
+#     message = models.ForeignKey(Message, related_name='message', on_delete=models.CASCADE)
+#     image_path = models.TextField()

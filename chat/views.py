@@ -142,7 +142,7 @@ def create_group(request):
 
     # if user has not selected any group icon then set default
     if not group_icon:
-        group_icon = 'group/blij1remmmq0i33fnirp'
+        group_icon = 'https://res.cloudinary.com/dhhzjlge9/image/upload/v1659526713/group/blij1remmmq0i33fnirp.png'
 
     group_room = get_random_string(10)
 
@@ -288,3 +288,12 @@ def add_group_members(request):
         GroupMembers.objects.create(group=group, user=user)
 
     return JsonResponse(members_list, safe=False)
+
+
+def save_image_to_db(request):
+    """
+    to save the sent image to the database and return its path
+    """
+    print(request.POST)
+    image_id = request.POST['image']
+    print(f"https://res.cloudinary.com/dhhzjlge9/image/upload/v1659613975/{image_id}.jpg")
