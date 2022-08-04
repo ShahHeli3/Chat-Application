@@ -106,7 +106,7 @@
                                 <div class="chat-leftsidebar-nav">
                                     <ul class="nav nav-pills nav-justified">
                                         <li class="nav-item">
-                                            <a href="#chat" data-bs-toggle="tab" aria-expanded="true"
+                                            <a href="#chat" data-bs-toggle="tab" aria-expanded="true" id="chat-bar"
                                                class="nav-link active">
                                                 <i class="bx bx-chat font-size-20 d-sm-none"></i>
                                                 <span class="d-none d-sm-block">Chat</span>
@@ -568,6 +568,14 @@
                 source: availableGroups
             });
         }
+    })
+
+    $('#chat-bar').click(function () {
+        document.getElementById('searchuser').style.display = 'block'
+        document.getElementById('search-group').style.display = 'none'
+
+        document.getElementById('btn-chat').style.display = 'block'
+        document.getElementById('btn-open-group').style.display = 'none'
     })
 
     $('#btn-open-group').click(function () {
