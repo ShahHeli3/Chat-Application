@@ -53,12 +53,12 @@ class Message(models.Model):
     sender_user = models.ForeignKey(CustomUser, related_name='sender', on_delete=SET(AnonymousUser.id))
     room = models.ForeignKey(Room, related_name='message_room', on_delete=models.CASCADE)
     message = models.TextField()
-    timestamp = models.CharField(max_length=100)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
 
-# class ImageShared(models.Model):
-#     """
-#     model for storing imaged shared in chat
-#     """
-#     message = models.ForeignKey(Message, related_name='message', on_delete=models.CASCADE)
-#     image_path = models.TextField()
+class ImageShared(models.Model):
+    """
+    model for storing imaged shared in chat
+    """
+    message = models.ForeignKey(Message, related_name='image_message', on_delete=models.CASCADE)
+    image_path = models.TextField()

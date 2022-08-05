@@ -294,6 +294,8 @@ def save_image_to_db(request):
     """
     to save the sent image to the database and return its path
     """
-    print(request.POST)
+    room_name = request.POST['room']
+
     image_id = request.POST['image']
-    print(f"https://res.cloudinary.com/dhhzjlge9/image/upload/v1659613975/{image_id}.jpg")
+    # room_obj = Room.objects.get(room_name=room_name)
+    # Message.objects.create(room=room_obj, sender_user=request.user, message="", timestamp="")

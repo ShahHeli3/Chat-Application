@@ -28,10 +28,10 @@ class ChatConsumer(WebsocketConsumer):
         )
 
     # save message in the database
-    def save_message(self, message, timestamp, sender_user_id):
+    def save_message(self, message, sender_user_id):
         sender_user = CustomUser.objects.get(id=sender_user_id)
         room = Room.objects.get(room_name=self.room_name)
-        new_message = Message.objects.create(sender_user=sender_user, room=room, message=message, timestamp=timestamp)
+        new_message = Message.objects.create(sender_user=sender_user, room=room, message=message)
         new_message.save()
 
     # Receive message from WebSocket
@@ -40,8 +40,7 @@ class ChatConsumer(WebsocketConsumer):
         message = text_data_json['message']
         sender_user = text_data_json['sender_user']
         sender_user_id = text_data_json['sender_user_id']
-        timestamp = text_data_json['timestamp']
-        self.save_message(message, timestamp, sender_user_id)
+        self.save_message(message, sender_user_id)
 
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(

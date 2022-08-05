@@ -638,6 +638,8 @@
         updateMessage(receiver)
     });
 
+    var roomName = ''
+
     function updateMessage(receiver) {
         document.getElementById('user-chat').style.display = 'block'
         document.getElementById('home-image').style.display = 'none'
@@ -656,7 +658,7 @@
                     if (data['message']) {
                         $("#search-bar-message").append('<h6>' + data['message'] + '</h6')
                     } else {
-                        var roomName = data['room_name']
+                        roomName = data['room_name']
 
                         $.ajax(
                             {
@@ -736,13 +738,9 @@
                     hour: '2-digit',
                     minute: '2-digit',
                     hour12: true
-                }).toLowerCase()
+                }).toUpperCase()
 
-            {#if the message#}
-            {#sender#}
-            {#is#}
-            {#the#}
-            {#logged in user#}
+            {#if the message sender is the logged in user#}
             if (data.sender_user === sender_user) {
                 $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
                     data.sender_user + "</div><p>" + data.message +
@@ -773,21 +771,11 @@
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
 
-            var current_date = new Date();
-            var formatted = " " + current_date.toLocaleString('default', {month: 'long'}) + " " + current_date.getDate().toString()
-                + ", " + current_date.getFullYear().toString() + " " +
-                current_date.toLocaleString('en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true
-                }).toLowerCase()
-
             if (message.trim().length !== 0) {
                 chatSocket.send(JSON.stringify({
                     'message': message,
                     'sender_user': sender_user,
                     'sender_user_id': sender_user_id,
-                    'timestamp': formatted
                 }));
                 messageInputDom.value = '';
             }
@@ -1071,7 +1059,7 @@
             function (error, result) {
                 if (error) console.log(error);
                 // If NO error, log image data to console
-               if (result[0].format !== 'jpg' && result[0].format !== 'png') {
+                if (result[0].format !== 'jpg' && result[0].format !== 'png') {
                     Swal.fire({
                         title: 'Invalid image format',
                         confirmButtonText: 'OK',
@@ -1167,26 +1155,27 @@
                 } else {
                     var url = result[0].secure_url
                     console.log(url)
+
+                    {# save to database  #}
+                    $.ajax({
+                        method: "POST",
+                        url: "/save_image_to_db",
+                        headers: {
+                            "X-CSRFToken": getCookie("csrftoken")
+                        },
+                        data: {
+                            'room': roomName,
+                            'image': url,
+                        },
+                        success: function (response) {
+                            console.log(response)
+                        }
+                    })
                 }
-
-
-                {#  save to database  #}
-                {#$.ajax({#}
-                {#    method: "POST",#}
-                {#    url: "/save_image_to_db",#}
-                {#    headers: {#}
-                {#        "X-CSRFToken": getCookie("csrftoken")#}
-                {#    },#}
-                {#    data: {#}
-                {#        'image': imageID,#}
-                {#    },#}
-                {#    success: function(response){#}
-                {#        console.log(response)#}
-                {#    }#}
-                {##}
             }
         )
     })
+
 
 </script>
 
