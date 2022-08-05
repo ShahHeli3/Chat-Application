@@ -20,4 +20,4 @@ class GetAllMessagesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ['room', 'message', 'timestamp', 'username', 'sender_user', 'full_name']
+        fields = ['room', 'message', 'timestamp', 'username', 'sender_user', 'full_name', 'message_type']

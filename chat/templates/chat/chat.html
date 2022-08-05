@@ -679,15 +679,21 @@
                                     document.getElementById("chat-messages").innerHTML = "";
 
                                     for (let i = 0; i < d['json'].length; i++) {
+                                        if (d['json'][i]['message_type'] === 'text') {
+                                            var text_data = "<p>" + d['json'][i]['message'] + "</p>"
+                                        } else {
+                                            var text_data = "<img src='" + d['json'][i]['message'] + "'>"
+                                        }
+
                                         if (receiver_user === d['json'][i]['username']) {
                                             $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                                                d['json'][i]['full_name'] + "</div><p>" + d['json'][i]['message'] +
-                                                "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                                                d['json'][i]['full_name'] + "</div>" + text_data +
+                                                "<p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
                                                 d['json'][i]['timestamp'] + "</p></div></div></li>")
                                         } else {
                                             $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                                                d['json'][i]['full_name'] + "</div><p>" + d['json'][i]['message'] +
-                                                "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                                                d['json'][i]['full_name'] + "</div>" + text_data +
+                                                "<p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
                                                 d['json'][i]['timestamp'] + "</p></div></div></li>")
                                         }
                                     }
@@ -743,8 +749,7 @@
             {#if the message sender is the logged in user#}
             if (data.sender_user === sender_user) {
                 $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                    data.sender_user + "</div><p>" + data.message +
-                    "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                    data.sender_user + "</div><p>" + data.message + "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
                     formatted + "</p></div></div></li>")
             } else {
                 $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
@@ -754,8 +759,8 @@
             }
             $("#chat-log").scrollTop($("#chat-log")[0].scrollHeight);
 
-        };
 
+        }
         chatSocket.onclose = function (e) {
             console.error('Chat socket closed unexpectedly');
         };
@@ -776,11 +781,13 @@
                     'message': message,
                     'sender_user': sender_user,
                     'sender_user_id': sender_user_id,
+                    'message_type': 'text'
                 }));
                 messageInputDom.value = '';
             }
         };
     }
+
 
     var availableTags = [];
     var groupMembersList = [];
@@ -940,19 +947,19 @@
 
         document.getElementById('change-group-name').value = document.getElementById('receiver_name').innerText
 
-        if (document.getElementById('left-bar-group-info').style.display === 'none'){
+        if (document.getElementById('left-bar-group-info').style.display === 'none') {
             $.ajax({
-            method: "GET",
-            url: "/get_group_members",
-            data: {
-                'room': roomName
-            },
-            success: function (response) {
-                for (let i = 0; i < response.length; i++) {
-                    $('#group-participants').append('<h6 class="font-size-12 mt-2">' + response[i] + '</h6>')
+                method: "GET",
+                url: "/get_group_members",
+                data: {
+                    'room': roomName
+                },
+                success: function (response) {
+                    for (let i = 0; i < response.length; i++) {
+                        $('#group-participants').append('<h6 class="font-size-12 mt-2">' + response[i] + '</h6>')
+                    }
                 }
-            }
-        })
+            })
         }
 
         document.getElementById('left-bar-create-group').style.display = 'none'
@@ -1137,49 +1144,79 @@
         })
     });
 
-    {#$("#send-image-file").click(function () {#}
-    {#    $.cloudinary.config({cloud_name: 'dhhzjlge9', api_key: '675879341691844'});#}
-    {#    cloudinary.openUploadWidget({#}
-    {#            cloud_name: 'dhhzjlge9',#}
-    {#            upload_preset: 'g5lmd3i3',#}
-    {#            tags: ['cgal']#}
-    {#        },#}
-    {#        function (error, result) {#}
-    {#            if (error) console.log(error);#}
-    {#            // If NO error, log image data to console#}
-    {##}
-    {#            if (result[0].format !== 'jpg' && result[0].format !== 'png') {#}
-    {#                Swal.fire({#}
-    {#                    title: 'Invalid image format',#}
-    {#                    confirmButtonText: 'OK',#}
-    {#                })#}
-    {#            } else {#}
-    {#                var url = result[0].secure_url#}
-    {#                console.log(url)#}
-    {##}
-                    {# save to database  #}
-    {#                $.ajax({#}
-    {#                    method: "POST",#}
-    {#                    url: "/save_image_to_db",#}
-    {#                    headers: {#}
-    {#                        "X-CSRFToken": getCookie("csrftoken")#}
-    {#                    },#}
-    {#                    data: {#}
-    {#                        'room': roomName,#}
-    {#                        'image': url,#}
-    {#                    },#}
-    {#                    success: function (response) {#}
-    {#                        console.log(response)#}
-    {##}
-                            {# send message to rooms #}
-    {##}
-    {##}
-    {#                    }#}
-    {#                })#}
-    {#            }#}
-    {#        }#}
-    {#    )#}
+    $("#send-image-file").click(function () {
+        $.cloudinary.config({cloud_name: 'dhhzjlge9', api_key: '675879341691844'});
+        cloudinary.openUploadWidget({
+                cloud_name: 'dhhzjlge9',
+                upload_preset: 'g5lmd3i3',
+                tags: ['cgal']
+            },
+            function (error, result) {
+                if (error) console.log(error);
+                // If NO error, log image data to console
 
+                if (result[0].format !== 'jpg' && result[0].format !== 'png') {
+                    Swal.fire({
+                        title: 'Invalid image format',
+                        confirmButtonText: 'OK',
+                    })
+                } else {
+                    var url = result[0].secure_url
+                    if (window.location.host === "inexture-chat.herokuapp.com") {
+                        var chatSocket = new WebSocket(
+                            'wss://'
+                            + window.location.host
+                            + '/ws/chat/'
+                            + roomName
+                            + '/'
+                        );
+                    }
+                    if (window.location.host === "127.0.0.1:8000") {
+                        var chatSocket = new WebSocket(
+                            'ws://'
+                            + window.location.host
+                            + '/ws/chat/'
+                            + roomName
+                            + '/'
+                        );
+                    }
+                    var current_date = new Date();
+                    var formatted = " " + current_date.toLocaleString('default', {month: 'long'}) + " " + current_date.getDate().toString()
+                        + ", " + current_date.getFullYear().toString() + " " +
+                        current_date.toLocaleString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true
+                        }).toUpperCase()
+
+                    chatSocket.onmessage = function (e) {
+                        console.log("onmessafec")
+                        const data = JSON.parse(e.data);
+                        console.log(data)
+
+                        if (data.sender_user === 'Heli') {
+                            console.log("message", data.message)
+                            $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                                data.sender_user + "</div><img src='" + data.message + "'><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                                formatted + "</p></div></div></li>")
+                        } else {
+                            $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                                data.sender_user + "</div><img src='" + data.message + "'><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                                formatted + "</p></div></div></li>")
+                        }
+                        $("#chat-log").scrollTop($("#chat-log")[0].scrollHeight);
+                    }
+
+                    chatSocket.onopen = () => chatSocket.send(JSON.stringify({
+                        'message': url,
+                        'sender_user': 'Heli',
+                        'sender_user_id': 1,
+                        'message_type': 'image'
+                    }));
+                }
+            }
+        )
+    })
 
 
 </script>
@@ -1188,3 +1225,6 @@
 
 <!-- Mirrored from themesbrand.com/skote/layouts/chat.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 26 Aug 2021 05:23:31 GMT -->
 </html>
+
+
+{# on message works twice#}

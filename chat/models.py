@@ -53,6 +53,7 @@ class Message(models.Model):
     sender_user = models.ForeignKey(CustomUser, related_name='sender', on_delete=SET(AnonymousUser.id))
     room = models.ForeignKey(Room, related_name='message_room', on_delete=models.CASCADE)
     message = models.TextField()
+    message_type = models.CharField(max_length=100, default='text')
     timestamp = models.DateTimeField(auto_now_add=True)
 
 
