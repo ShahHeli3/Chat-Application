@@ -853,10 +853,10 @@
                         title: 'Invalid image format',
                         confirmButtonText: 'OK',
                     })
+                } else {
+                    imageID = result[0].secure_url;
+                    $('#add-group-icon').append(imageID)
                 }
-
-                imageID = result[0].secure_url;
-                $('#add-group-icon').append(imageID)
             });
     }
 
@@ -874,7 +874,7 @@
                 'group_members': groupMembersList,
             },
             success: function (response) {
-                var roomName = response['room_name']
+                roomName = response['room_name']
 
                 updateGroupChat(roomName, groupName)
 
@@ -883,6 +883,7 @@
     }
 
     function updateGroupChat(room, group) {
+        roomName = room
 
         document.getElementById('home-image').style.display = 'none'
         document.getElementById('user-chat').style.display = 'block'
@@ -941,14 +942,11 @@
         document.getElementById('left-bar').style.display = 'none'
         document.getElementById('left-bar-group-info').style.display = 'block'
 
-        var group_name = document.getElementById('receiver_name').innerText
-        document.getElementById('change-group-name').value = group_name
-
         $.ajax({
             method: "GET",
             url: "/get_group_members",
             data: {
-                group_name: group_name
+                'room': roomName
             },
             success: function (response) {
                 for (let i = 0; i < response.length; i++) {
@@ -961,7 +959,7 @@
             method: "GET",
             url: "/get_users_except_group_members",
             data: {
-                'group_name': group_name
+                'room': roomName
             },
             success: function (response) {
                 availableMembers = response
@@ -1000,7 +998,6 @@
 
     function addGroupMembers() {
         document.getElementById('group-info-message').innerHTML = ''
-        group_name = document.getElementById('receiver_name').innerText
 
         $.ajax({
             method: "POST",
@@ -1009,7 +1006,7 @@
                 "X-CSRFToken": getCookie("csrftoken")
             },
             data: {
-                'group_name': group_name,
+                'room': roomName,
                 'members': addMembersList,
             },
             success: function (response) {
@@ -1027,13 +1024,12 @@
     }
 
     function changeGroupName() {
-        var old_name = document.getElementById('receiver_name').innerText
         var name = document.getElementById('change-group-name').value
         $.ajax({
             method: "POST",
             url: "/change_group_name",
             data: {
-                'old_name': old_name,
+                'room': roomName,
                 'name': name
             },
             headers: {
@@ -1064,26 +1060,26 @@
                         title: 'Invalid image format',
                         confirmButtonText: 'OK',
                     })
+                } else {
+                    imageID = result[0].secure_url;
+
+                    $.ajax({
+                        method: "POST",
+                        url: "/update_group_icon",
+                        headers: {
+                            "X-CSRFToken": getCookie("csrftoken")
+                        },
+                        data: {
+                            'room': roomName,
+                            'image_url': imageID
+                        },
+                        success: function (response) {
+                            document.getElementById('group-info-message').innerHTML = ''
+                            $('#group-info-message').append(('<h6>' + response['message'] + '</h6>'))
+                            document.getElementById("receiver-image").src = imageID
+                        }
+                    })
                 }
-
-                imageID = result[0].secure_url;
-
-                $.ajax({
-                    method: "POST",
-                    url: "/update_group_icon",
-                    headers: {
-                        "X-CSRFToken": getCookie("csrftoken")
-                    },
-                    data: {
-                        'group_name': document.getElementById('receiver_name').innerText,
-                        'image_url': imageID
-                    },
-                    success: function (response) {
-                        document.getElementById('group-info-message').innerHTML = ''
-                        $('#group-info-message').append(('<h6>' + response['message'] + '</h6>'))
-                        document.getElementById("receiver-image").src = imageID
-                    }
-                })
             }
         );
     }
@@ -1116,7 +1112,7 @@
                         "X-CSRFToken": getCookie("csrftoken")
                     },
                     data: {
-                        'group_name': document.getElementById('receiver_name').innerText
+                        'room': roomName
                     },
                     success: function (response) {
                         document.getElementById('home-image').style.display = 'block'
@@ -1169,6 +1165,43 @@
                         },
                         success: function (response) {
                             console.log(response)
+
+                            {# send message to rooms #}
+
+                            const chatSocket = new WebSocket(
+                                'ws://'
+                                + window.location.host
+                                + '/ws/chat/'
+                                + roomName
+                                + '/'
+                            );
+
+                            chatSocket.onmessage = function (e) {
+                                const data = JSON.parse(e.data);
+                                document.querySelector('#chat-log').value += (data.message + '\n');
+                            };
+
+                            chatSocket.onclose = function (e) {
+                                console.error('Chat socket closed unexpectedly');
+                            };
+
+                            document.querySelector('#chat-message-input').focus();
+                            document.querySelector('#chat-message-input').onkeyup = function (e) {
+                                if (e.keyCode === 13) {  // enter, return
+                                    document.querySelector('#chat-message-submit').click();
+                                }
+                            };
+
+                            document.querySelector('#chat-message-submit').onclick = function (e) {
+                                const messageInputDom = document.querySelector('#chat-message-input');
+                                const message = messageInputDom.value;
+                                chatSocket.send(JSON.stringify({
+                                    'message': message
+                                }));
+                                messageInputDom.value = '';
+                            };
+
+
                         }
                     })
                 }

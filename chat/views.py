@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.crypto import get_random_string
 
-from chat.models import Room, Message, PersonalRoom, Group, GroupMembers
+from chat.models import Room, Message, PersonalRoom, Group, GroupMembers, ImageShared
 from chat.serializer import GetAllMessagesSerializer
 from users.models import CustomUser
 
@@ -213,14 +213,18 @@ def change_group_name(request):
     """
     to update the group name
     """
-    group_name = request.POST['old_name']
+    room_name = request.POST['room']
     new_name = request.POST['name']
 
-    if new_name == group_name:
+    room_obj = Room.objects.get(room_name=room_name)
+    group_obj = Group.objects.get(room=room_obj)
+
+    print(group_obj)
+
+    if new_name == group_obj.group_name:
         return JsonResponse({'status': False})
 
-    group = GroupMembers.objects.get(group__group_name=group_name, user=request.user).group_id
-    Group.objects.filter(id=group).update(group_name=new_name)
+    Group.objects.filter(id=group_obj.id).update(group_name=new_name)
     return JsonResponse({'status': True})
 
 
@@ -228,10 +232,13 @@ def update_group_icon(request):
     """
     to update the group icon
     """
-    group_name = request.POST['group_name']
+    room_name = request.POST['room']
     icon = request.POST['image_url']
-    group = GroupMembers.objects.get(group__group_name=group_name, user=request.user).group_id
-    Group.objects.filter(id=group).update(group_icon=icon)
+
+    room_obj = Room.objects.get(room_name=room_name)
+    group_obj = Group.objects.get(room=room_obj)
+
+    Group.objects.filter(id=group_obj.id).update(group_icon=icon)
     return JsonResponse({'message': 'Group Icon Updated'})
 
 
@@ -239,20 +246,26 @@ def exit_group(request):
     """
     to leave the group
     """
-    group_name = request.POST['group_name']
-    group_member = GroupMembers.objects.get(group__group_name=group_name, user=request.user)
-    group_room_id = group_member.group.room.id
+    room_name = request.POST['room']
+
+    room_obj = Room.objects.get(room_name=room_name)
+    group_obj = Group.objects.get(room=room_obj)
+
+    group_member = GroupMembers.objects.get(group=group_obj, user=request.user)
     group_member.delete()
-    return JsonResponse({'room': group_room_id})
+    return JsonResponse({'room': room_obj.id})
 
 
 def get_group_members(request):
     """
     to get existing group members
     """
-    group_name = request.GET['group_name']
-    group = GroupMembers.objects.get(group__group_name=group_name, user=request.user).group
-    group_members = GroupMembers.objects.filter(group=group)
+    room_name = request.GET['room']
+
+    room_obj = Room.objects.get(room_name=room_name)
+    group_obj = Group.objects.get(room=room_obj)
+
+    group_members = GroupMembers.objects.filter(group=group_obj)
     group_members_list = [group_member.user.full_name for group_member in group_members]
     return JsonResponse(group_members_list, safe=False)
 
@@ -261,10 +274,14 @@ def get_users_except_group_members(request):
     """
     to get users other than group members for suggestions while adding members
     """
-    group_name = request.GET['group_name']
-    group = GroupMembers.objects.get(group__group_name=group_name, user=request.user).group
-    group_members = list(GroupMembers.objects.filter(group=group).values_list('user__username', flat=True))
+    room_name = request.GET['room']
+
+    room_obj = Room.objects.get(room_name=room_name)
+    group_obj = Group.objects.get(room=room_obj)
+
+    group_members = list(GroupMembers.objects.filter(group=group_obj).values_list('user__username', flat=True))
     users = list(CustomUser.objects.all().values_list('username', flat=True))
+
     available_users = [i for i in users if i not in group_members]
 
     return JsonResponse(available_users, safe=False)
@@ -274,10 +291,11 @@ def add_group_members(request):
     """
     to add group members
     """
-    group_name = request.POST['group_name']
+    room_name = request.POST['room']
     group_members_list = request.POST.getlist('members[]')
 
-    group = GroupMembers.objects.get(user=request.user, group__group_name=group_name).group
+    room_obj = Room.objects.get(room_name=room_name)
+    group_obj = Group.objects.get(room=room_obj)
 
     members_list = []
 
@@ -285,7 +303,7 @@ def add_group_members(request):
         user = CustomUser.objects.get(username=member)
         member_name = user.full_name
         members_list.append(member_name)
-        GroupMembers.objects.create(group=group, user=user)
+        GroupMembers.objects.create(group=group_obj, user=user)
 
     return JsonResponse(members_list, safe=False)
 
@@ -295,7 +313,13 @@ def save_image_to_db(request):
     to save the sent image to the database and return its path
     """
     room_name = request.POST['room']
+    image_url = request.POST['image']
 
-    image_id = request.POST['image']
-    # room_obj = Room.objects.get(room_name=room_name)
-    # Message.objects.create(room=room_obj, sender_user=request.user, message="", timestamp="")
+    room_obj = Room.objects.get(room_name=room_name)
+    new_message = Message.objects.create(room=room_obj, sender_user=request.user, message="")
+    new_message.save()
+    ImageShared.objects.create(message=new_message, image_path=image_url)
+    return JsonResponse({
+        'sender_user': request.user.full_name,
+        'sender_user_id': request.user.id
+    })
