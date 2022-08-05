@@ -219,8 +219,6 @@ def change_group_name(request):
     room_obj = Room.objects.get(room_name=room_name)
     group_obj = Group.objects.get(room=room_obj)
 
-    print(group_obj)
-
     if new_name == group_obj.group_name:
         return JsonResponse({'status': False})
 

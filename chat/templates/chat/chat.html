@@ -938,11 +938,10 @@
 
     function groupInfo() {
 
-        document.getElementById('left-bar-create-group').style.display = 'none'
-        document.getElementById('left-bar').style.display = 'none'
-        document.getElementById('left-bar-group-info').style.display = 'block'
+        document.getElementById('change-group-name').value = document.getElementById('receiver_name').innerText
 
-        $.ajax({
+        if (document.getElementById('left-bar-group-info').style.display === 'block'){
+            $.ajax({
             method: "GET",
             url: "/get_group_members",
             data: {
@@ -954,6 +953,12 @@
                 }
             }
         })
+        }
+
+        document.getElementById('left-bar-create-group').style.display = 'none'
+        document.getElementById('left-bar').style.display = 'none'
+        document.getElementById('left-bar-group-info').style.display = 'block'
+
 
         $.ajax({
             method: "GET",
@@ -1132,82 +1137,49 @@
         })
     });
 
-    $("#send-image-file").click(function () {
-        $.cloudinary.config({cloud_name: 'dhhzjlge9', api_key: '675879341691844'});
-        cloudinary.openUploadWidget({
-                cloud_name: 'dhhzjlge9',
-                upload_preset: 'g5lmd3i3',
-                tags: ['cgal']
-            },
-            function (error, result) {
-                if (error) console.log(error);
-                // If NO error, log image data to console
-
-                if (result[0].format !== 'jpg' && result[0].format !== 'png') {
-                    Swal.fire({
-                        title: 'Invalid image format',
-                        confirmButtonText: 'OK',
-                    })
-                } else {
-                    var url = result[0].secure_url
-                    console.log(url)
-
+    {#$("#send-image-file").click(function () {#}
+    {#    $.cloudinary.config({cloud_name: 'dhhzjlge9', api_key: '675879341691844'});#}
+    {#    cloudinary.openUploadWidget({#}
+    {#            cloud_name: 'dhhzjlge9',#}
+    {#            upload_preset: 'g5lmd3i3',#}
+    {#            tags: ['cgal']#}
+    {#        },#}
+    {#        function (error, result) {#}
+    {#            if (error) console.log(error);#}
+    {#            // If NO error, log image data to console#}
+    {##}
+    {#            if (result[0].format !== 'jpg' && result[0].format !== 'png') {#}
+    {#                Swal.fire({#}
+    {#                    title: 'Invalid image format',#}
+    {#                    confirmButtonText: 'OK',#}
+    {#                })#}
+    {#            } else {#}
+    {#                var url = result[0].secure_url#}
+    {#                console.log(url)#}
+    {##}
                     {# save to database  #}
-                    $.ajax({
-                        method: "POST",
-                        url: "/save_image_to_db",
-                        headers: {
-                            "X-CSRFToken": getCookie("csrftoken")
-                        },
-                        data: {
-                            'room': roomName,
-                            'image': url,
-                        },
-                        success: function (response) {
-                            console.log(response)
-
+    {#                $.ajax({#}
+    {#                    method: "POST",#}
+    {#                    url: "/save_image_to_db",#}
+    {#                    headers: {#}
+    {#                        "X-CSRFToken": getCookie("csrftoken")#}
+    {#                    },#}
+    {#                    data: {#}
+    {#                        'room': roomName,#}
+    {#                        'image': url,#}
+    {#                    },#}
+    {#                    success: function (response) {#}
+    {#                        console.log(response)#}
+    {##}
                             {# send message to rooms #}
+    {##}
+    {##}
+    {#                    }#}
+    {#                })#}
+    {#            }#}
+    {#        }#}
+    {#    )#}
 
-                            const chatSocket = new WebSocket(
-                                'ws://'
-                                + window.location.host
-                                + '/ws/chat/'
-                                + roomName
-                                + '/'
-                            );
-
-                            chatSocket.onmessage = function (e) {
-                                const data = JSON.parse(e.data);
-                                document.querySelector('#chat-log').value += (data.message + '\n');
-                            };
-
-                            chatSocket.onclose = function (e) {
-                                console.error('Chat socket closed unexpectedly');
-                            };
-
-                            document.querySelector('#chat-message-input').focus();
-                            document.querySelector('#chat-message-input').onkeyup = function (e) {
-                                if (e.keyCode === 13) {  // enter, return
-                                    document.querySelector('#chat-message-submit').click();
-                                }
-                            };
-
-                            document.querySelector('#chat-message-submit').onclick = function (e) {
-                                const messageInputDom = document.querySelector('#chat-message-input');
-                                const message = messageInputDom.value;
-                                chatSocket.send(JSON.stringify({
-                                    'message': message
-                                }));
-                                messageInputDom.value = '';
-                            };
-
-
-                        }
-                    })
-                }
-            }
-        )
-    })
 
 
 </script>
