@@ -16,7 +16,7 @@ class GetAllMessagesSerializer(serializers.ModelSerializer):
         return obj.sender_user.full_name
 
     def get_timestamp(self, obj):
-        return obj.timestamp.strftime('%B %-d, %Y %-I:%-M %p')
+        return obj.timestamp.strftime('%B %-d, %Y %I:%M %p')
 
     class Meta:
         model = Message
