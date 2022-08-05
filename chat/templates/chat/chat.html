@@ -940,7 +940,7 @@
 
         document.getElementById('change-group-name').value = document.getElementById('receiver_name').innerText
 
-        if (document.getElementById('left-bar-group-info').style.display === 'block'){
+        if (document.getElementById('left-bar-group-info').style.display === 'none'){
             $.ajax({
             method: "GET",
             url: "/get_group_members",
