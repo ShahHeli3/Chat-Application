@@ -540,7 +540,7 @@
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 <script src='https://cdn.rawgit.com/pguso/jquery-plugin-circliful/master/js/jquery.circliful.min.js'></script>
 <script src='https://cdn.jsdelivr.net/jquery.cloudinary/1.0.18/jquery.cloudinary.js' type='text/javascript'></script>
-<script src="//widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+<script src="https://widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.8/dist/sweetalert2.all.min.js"></script>
 
 
@@ -758,7 +758,6 @@
         $("#chat-log").scrollTop($("#chat-log")[0].scrollHeight);
 
         var chatSocket = createChatSocket()
-        console.log(chatSocket)
 
         displayMessage(chatSocket)
 
@@ -855,7 +854,6 @@
     function displayMessage(chatSocket) {
         chatSocket.onmessage = function (e) {
             const data = JSON.parse(e.data);
-            console.log("message data--->", data)
 
             var formatted = getDateTime()
 
