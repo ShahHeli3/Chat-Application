@@ -321,3 +321,14 @@ def save_image_to_db(request):
         'sender_user': request.user.full_name,
         'sender_user_id': request.user.id
     })
+
+
+def send_image_files(request):
+    """
+    function to get required details to send image files
+    """
+    user = request.user
+    return JsonResponse({
+        'sender_user_id': user.id,
+        'sender_user': user.full_name,
+    })

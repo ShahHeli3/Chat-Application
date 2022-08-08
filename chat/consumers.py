@@ -17,7 +17,6 @@ class ChatConsumer(WebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-        print("CONNECTED")
         self.accept()
 
     def disconnect(self, close_code):
@@ -29,24 +28,19 @@ class ChatConsumer(WebsocketConsumer):
 
     # save message in the database
     def save_message(self, message, sender_user_id, message_type):
-        print("save")
         sender_user = CustomUser.objects.get(id=sender_user_id)
         room = Room.objects.get(room_name=self.room_name)
         new_message = Message.objects.create(sender_user=sender_user, room=room, message=message,
                                              message_type=message_type)
         new_message.save()
-        print("saved")
 
     # Receive message from WebSocket
     def receive(self, text_data):
-        print("receive")
         text_data_json = json.loads(text_data)
-        print(text_data_json)
         message = text_data_json['message']
         sender_user = text_data_json['sender_user']
         sender_user_id = text_data_json['sender_user_id']
         message_type = text_data_json['message_type']
-        print("call save")
         self.save_message(message, sender_user_id, message_type)
 
         # Send message to room group
@@ -56,20 +50,22 @@ class ChatConsumer(WebsocketConsumer):
                 'type': 'chat_message',
                 'message': message,
                 'sender_user': sender_user,
-                'message_type': message_type
+                'message_type': message_type,
+                'sender_user_id': sender_user_id
             }
         )
 
     # Receive message from room group
     def chat_message(self, event):
-        print("event")
         message = event['message']
         sender_user = event['sender_user']
         message_type = event['message_type']
+        sender_user_id = event['sender_user_id']
 
         # Send message to WebSocket
         self.send(text_data=json.dumps({
             'message': message,
             'sender_user': sender_user,
-            'message_type': message_type
+            'message_type': message_type,
+            'sender_user_id': sender_user_id
         }))

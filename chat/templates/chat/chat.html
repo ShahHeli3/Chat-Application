@@ -547,6 +547,7 @@
     var availableUsers = [];
     var availableGroups = [];
     var allGroups = [];
+    var user = '{{ user.id }}'
 
     $('#group-chat').click(function () {
         document.getElementById('searchuser').style.display = 'none'
@@ -690,7 +691,8 @@
                                                 d['json'][i]['full_name'] + "</div>" + text_data +
                                                 "<p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
                                                 d['json'][i]['timestamp'] + "</p></div></div></li>")
-                                        } else {
+                                        }
+                                        else {
                                             $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
                                                 d['json'][i]['full_name'] + "</div>" + text_data +
                                                 "<p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
@@ -708,12 +710,24 @@
         )
     }
 
-    {#chat#}
+    {# function to get current date in required format #}
 
-    function chat(roomName, sender_user, sender_user_id) {
+    function getDateTime() {
+        var current_date = new Date();
+        var formatted = " " + current_date.toLocaleString('default', {month: 'long'}) + " " + current_date.getDate().toString()
+            + ", " + current_date.getFullYear().toString() + " " +
+            current_date.toLocaleString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            }).toUpperCase()
+        return formatted
+    }
 
-        $("#chat-log").scrollTop($("#chat-log")[0].scrollHeight);
+    {# function to create chatSocket url #}
 
+
+    function createChatSocket() {
         if (window.location.host === "inexture-chat.herokuapp.com") {
             var chatSocket = new WebSocket(
                 'wss://'
@@ -732,35 +746,20 @@
                 + '/'
             );
         }
+        return chatSocket
+    }
 
+    {#chat#}
 
-        chatSocket.onmessage = function (e) {
-            const data = JSON.parse(e.data);
+    function chat(roomName, sender_user, sender_user_id) {
 
-            var current_date = new Date();
-            var formatted = " " + current_date.toLocaleString('default', {month: 'long'}) + " " + current_date.getDate().toString()
-                + ", " + current_date.getFullYear().toString() + " " +
-                current_date.toLocaleString('en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true
-                }).toUpperCase()
+        $("#chat-log").scrollTop($("#chat-log")[0].scrollHeight);
 
-            {#if the message sender is the logged in user#}
-            if (data.sender_user === sender_user) {
-                $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                    data.sender_user + "</div><p>" + data.message + "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
-                    formatted + "</p></div></div></li>")
-            } else {
-                $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                    data.sender_user + "</div><p>" + data.message +
-                    "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
-                    formatted + "</p></div></div></li>")
-            }
-            $("#chat-log").scrollTop($("#chat-log")[0].scrollHeight);
+        var chatSocket = createChatSocket()
+        console.log(chatSocket)
 
+        displayMessage(chatSocket)
 
-        }
         chatSocket.onclose = function (e) {
             console.error('Chat socket closed unexpectedly');
         };
@@ -786,6 +785,92 @@
                 messageInputDom.value = '';
             }
         };
+
+        document.querySelector('#send-image-file').onclick = function (e) {
+            $.cloudinary.config({cloud_name: 'dhhzjlge9', api_key: '675879341691844'});
+            cloudinary.openUploadWidget({
+                    cloud_name: 'dhhzjlge9',
+                    upload_preset: 'g5lmd3i3',
+                    tags: ['cgal']
+                },
+                function (error, result) {
+                    if (error) console.log(error);
+                    // If NO error, log image data to console
+
+                    if (result[0].format !== 'jpg' && result[0].format !== 'png') {
+                        Swal.fire({
+                            title: 'Invalid image format',
+                            confirmButtonText: 'OK',
+                        })
+                    } else {
+
+                        $.ajax({
+                            method: 'GET',
+                            url: '/send_image_files',
+                            data: {
+                                'room': roomName
+                            },
+                            success: function (response) {
+                                var image_sender_user_id = response['sender_user_id']
+                                var image_sender_user = response['sender_user']
+
+                                var url = result[0].secure_url
+                                chatSocket.send(JSON.stringify({
+                                    'message': url,
+                                    'sender_user': image_sender_user,
+                                    'sender_user_id': image_sender_user_id,
+                                    'message_type': 'image'
+                                }));
+                            }
+                        })
+                    }
+                }
+            )
+        }
+    }
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function displayMessage(chatSocket) {
+        chatSocket.onmessage = function (e) {
+            const data = JSON.parse(e.data);
+            console.log("message data--->", data)
+
+            var formatted = getDateTime()
+
+            {#if the message is text#}
+            if (data.message_type === 'text') {
+                if (data.sender_user_id.toString() === user) {
+                    $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                        data.sender_user + "</div><p>" + data.message + "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                        formatted + "</p></div></div></li>")
+                } else {
+                    $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                        data.sender_user + "</div><p>" + data.message +
+                        "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                        formatted + "</p></div></div></li>")
+                }
+            }
+            {# if the messsage is an image file #}
+            else if (data.message_type === 'image') {
+                if (data.sender_user_id.toString() === user) {
+                    sleep(1).then(() => {
+                        $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                            data.sender_user + "</div><img src='" + data.message + "'><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                            formatted + "</p></div></div></li>")
+                    })
+                } else {
+                    sleep(10).then(() => {
+                        $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                            data.sender_user + "</div><img src='" + data.message + "'><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                            formatted + "</p></div></div></li>")
+                    })
+                }
+            }
+            $("#chat-log").scrollTop($("#chat-log")[0].scrollHeight);
+        }
     }
 
 
@@ -1143,80 +1228,6 @@
             }
         })
     });
-
-    $("#send-image-file").click(function () {
-        $.cloudinary.config({cloud_name: 'dhhzjlge9', api_key: '675879341691844'});
-        cloudinary.openUploadWidget({
-                cloud_name: 'dhhzjlge9',
-                upload_preset: 'g5lmd3i3',
-                tags: ['cgal']
-            },
-            function (error, result) {
-                if (error) console.log(error);
-                // If NO error, log image data to console
-
-                if (result[0].format !== 'jpg' && result[0].format !== 'png') {
-                    Swal.fire({
-                        title: 'Invalid image format',
-                        confirmButtonText: 'OK',
-                    })
-                } else {
-                    var url = result[0].secure_url
-                    if (window.location.host === "inexture-chat.herokuapp.com") {
-                        var chatSocket = new WebSocket(
-                            'wss://'
-                            + window.location.host
-                            + '/ws/chat/'
-                            + roomName
-                            + '/'
-                        );
-                    }
-                    if (window.location.host === "127.0.0.1:8000") {
-                        var chatSocket = new WebSocket(
-                            'ws://'
-                            + window.location.host
-                            + '/ws/chat/'
-                            + roomName
-                            + '/'
-                        );
-                    }
-                    var current_date = new Date();
-                    var formatted = " " + current_date.toLocaleString('default', {month: 'long'}) + " " + current_date.getDate().toString()
-                        + ", " + current_date.getFullYear().toString() + " " +
-                        current_date.toLocaleString('en-US', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: true
-                        }).toUpperCase()
-
-                    chatSocket.onmessage = function (e) {
-                        console.log("onmessafec")
-                        const data = JSON.parse(e.data);
-                        console.log(data)
-
-                        if (data.sender_user === 'Heli') {
-                            console.log("message", data.message)
-                            $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                                data.sender_user + "</div><img src='" + data.message + "'><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
-                                formatted + "</p></div></div></li>")
-                        } else {
-                            $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                                data.sender_user + "</div><img src='" + data.message + "'><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
-                                formatted + "</p></div></div></li>")
-                        }
-                        $("#chat-log").scrollTop($("#chat-log")[0].scrollHeight);
-                    }
-
-                    chatSocket.onopen = () => chatSocket.send(JSON.stringify({
-                        'message': url,
-                        'sender_user': 'Heli',
-                        'sender_user_id': 1,
-                        'message_type': 'image'
-                    }));
-                }
-            }
-        )
-    })
 
 
 </script>
