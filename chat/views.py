@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.crypto import get_random_string
 
-from chat.models import Room, Message, PersonalRoom, Group, GroupMembers, ImageShared
+from chat.models import Room, Message, PersonalRoom, Group, GroupMembers
 from chat.serializer import GetAllMessagesSerializer
 from users.models import CustomUser
 
@@ -304,31 +304,3 @@ def add_group_members(request):
         GroupMembers.objects.create(group=group_obj, user=user)
 
     return JsonResponse(members_list, safe=False)
-
-
-def save_image_to_db(request):
-    """
-    to save the sent image to the database and return its path
-    """
-    room_name = request.POST['room']
-    image_url = request.POST['image']
-
-    room_obj = Room.objects.get(room_name=room_name)
-    new_message = Message.objects.create(room=room_obj, sender_user=request.user, message="")
-    new_message.save()
-    ImageShared.objects.create(message=new_message, image_path=image_url)
-    return JsonResponse({
-        'sender_user': request.user.full_name,
-        'sender_user_id': request.user.id
-    })
-
-
-def send_image_files(request):
-    """
-    function to get required details to send image files
-    """
-    user = request.user
-    return JsonResponse({
-        'sender_user_id': user.id,
-        'sender_user': user.full_name,
-    })

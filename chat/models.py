@@ -55,11 +55,3 @@ class Message(models.Model):
     message = models.TextField()
     message_type = models.CharField(max_length=100, default='text')
     timestamp = models.DateTimeField(auto_now_add=True)
-
-
-class ImageShared(models.Model):
-    """
-    model for storing imaged shared in chat
-    """
-    message = models.ForeignKey(Message, related_name='image_message', on_delete=models.CASCADE)
-    image_path = models.TextField()

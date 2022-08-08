@@ -18,7 +18,5 @@ urlpatterns = [
     path('get_group_members', views.get_group_members, name='get_group_members'),
     path('get_users_except_group_members', views.get_users_except_group_members, name='get_users_except_group_members'),
     path('add_group_members', views.add_group_members, name='add_group_members'),
-    path('save_image_to_db', views.save_image_to_db, name='save_image_to_db'),
-    path('send_image_files', views.send_image_files, name='send_image_files')
 
 ]

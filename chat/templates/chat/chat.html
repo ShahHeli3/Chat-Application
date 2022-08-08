@@ -420,16 +420,18 @@
                                                        placeholder="Enter Message...">
                                                 <div class="chat-input-links" id="tooltip-container">
                                                     <ul class="list-inline mb-0">
-                                                        <li class="list-inline-item"><a href="javascript: void(0);"
-                                                                                        title="Emoji"><i
-                                                                class="mdi mdi-emoticon-happy-outline"></i></a></li>
-                                                        <li class="list-inline-item" id="send-image-file"><a
-                                                                href="javascript: void(0);"
-                                                                title="Images"><i
-                                                                class="mdi mdi-file-image-outline"></i></a></li>
-                                                        <li class="list-inline-item"><a href="javascript: void(0);"
-                                                                                        title="Add Files"><i
-                                                                class="mdi mdi-file-document-outline"></i></a></li>
+                                                        <li class="list-inline-item">
+                                                            <a href="javascript: void(0);" title="Emoji">
+                                                                <i class="mdi mdi-emoticon-happy-outline"></i></a></li>
+                                                        <li class="list-inline-item" id="send-image-file">
+                                                            <a href="javascript: void(0);" title="Images">
+                                                                <i class="mdi mdi-file-image-outline"></i></a></li>
+                                                        <li class="list-inline-item" id="send-video-file">
+                                                            <a href="javascript: void(0);" title="Add Videos">
+                                                                <i class="mdi mdi-file-video-outline"></i></a></li>
+                                                        <li class="list-inline-item">
+                                                            <a href="javascript: void(0);" title="Add Files">
+                                                                <i class="mdi mdi-file-document-outline"></i></a></li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -681,20 +683,21 @@
 
                                     for (let i = 0; i < d['json'].length; i++) {
                                         if (d['json'][i]['message_type'] === 'text') {
-                                            var text_data = "<p>" + d['json'][i]['message'] + "</p>"
-                                        } else {
-                                            var text_data = "<img src='" + d['json'][i]['message'] + "'>"
+                                            var message_data = "<p>" + d['json'][i]['message'] + "</p>"
+                                        } else if (d['json'][i]['message_type'] === 'image') {
+                                            var message_data = "<img src='" + d['json'][i]['message'] + "'>"
+                                        } else if (d['json'][i]['message_type'] === 'video') {
+                                            var message_data = "<video width='320' height='240' controls><source src='" + d['json'][i]['message'] + "' type='video/mp4'></video>"
                                         }
 
                                         if (receiver_user === d['json'][i]['username']) {
                                             $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                                                d['json'][i]['full_name'] + "</div>" + text_data +
+                                                d['json'][i]['full_name'] + "</div>" + message_data +
                                                 "<p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
                                                 d['json'][i]['timestamp'] + "</p></div></div></li>")
-                                        }
-                                        else {
+                                        } else {
                                             $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                                                d['json'][i]['full_name'] + "</div>" + text_data +
+                                                d['json'][i]['full_name'] + "</div>" + message_data +
                                                 "<p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
                                                 d['json'][i]['timestamp'] + "</p></div></div></li>")
                                         }
@@ -725,7 +728,6 @@
     }
 
     {# function to create chatSocket url #}
-
 
     function createChatSocket() {
         if (window.location.host === "inexture-chat.herokuapp.com") {
@@ -803,29 +805,46 @@
                             confirmButtonText: 'OK',
                         })
                     } else {
-
-                        $.ajax({
-                            method: 'GET',
-                            url: '/send_image_files',
-                            data: {
-                                'room': roomName
-                            },
-                            success: function (response) {
-                                var image_sender_user_id = response['sender_user_id']
-                                var image_sender_user = response['sender_user']
-
-                                var url = result[0].secure_url
-                                chatSocket.send(JSON.stringify({
-                                    'message': url,
-                                    'sender_user': image_sender_user,
-                                    'sender_user_id': image_sender_user_id,
-                                    'message_type': 'image'
-                                }));
-                            }
-                        })
+                        var url = result[0].secure_url
+                        chatSocket.send(JSON.stringify({
+                            'message': url,
+                            'sender_user': sender_user,
+                            'sender_user_id': sender_user_id,
+                            'message_type': 'image'
+                        }));
                     }
                 }
             )
+        }
+
+        document.querySelector('#send-video-file').onclick = function (e) {
+            $.cloudinary.config({cloud_name: 'dhhzjlge9', api_key: '675879341691844'});
+            cloudinary.openUploadWidget({
+                    cloud_name: 'dhhzjlge9',
+                    upload_preset: 'y4rx3bp1',
+                    tags: ['cgal']
+                },
+                function (error, result) {
+                    if (error) console.log(error);
+                    // If NO error, log image data to console
+
+                    if (result[0].format !== 'mp4') {
+                        Swal.fire({
+                            title: 'Invalid video format',
+                            confirmButtonText: 'OK',
+                        })
+                    } else {
+                        var url = result[0].secure_url
+                        chatSocket.send(JSON.stringify({
+                            'message': url,
+                            'sender_user': sender_user,
+                            'sender_user_id': sender_user_id,
+                            'message_type': 'video'
+                        }));
+                    }
+                }
+            )
+
         }
     }
 
@@ -856,7 +875,7 @@
             {# if the messsage is an image file #}
             else if (data.message_type === 'image') {
                 if (data.sender_user_id.toString() === user) {
-                    sleep(1).then(() => {
+                    sleep(0).then(() => {
                         $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
                             data.sender_user + "</div><img src='" + data.message + "'><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
                             formatted + "</p></div></div></li>")
@@ -865,6 +884,22 @@
                     sleep(10).then(() => {
                         $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
                             data.sender_user + "</div><img src='" + data.message + "'><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                            formatted + "</p></div></div></li>")
+                    })
+                }
+            }
+            {# if the messsage is an video file #}
+            else if (data.message_type === 'video') {
+                if (data.sender_user_id.toString() === user) {
+                    sleep(0).then(() => {
+                        $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                            data.sender_user + "</div><video width='320' height='240' controls><source src='" + data.message + "' type='video/mp4'></video><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                            formatted + "</p></div></div></li>")
+                    })
+                } else {
+                    sleep(10).then(() => {
+                        $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                            data.sender_user + "</div><video width='320' height='240' controls><source src='" + data.message + "' type='video/mp4'></video><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
                             formatted + "</p></div></div></li>")
                     })
                 }
