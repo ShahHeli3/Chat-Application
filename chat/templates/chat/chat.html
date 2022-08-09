@@ -685,7 +685,7 @@
                                         if (d['json'][i]['message_type'] === 'text') {
                                             var message_data = "<p>" + d['json'][i]['message'] + "</p>"
                                         } else if (d['json'][i]['message_type'] === 'image') {
-                                            var message_data = "<img src='" + d['json'][i]['message'] + "'>"
+                                            var message_data = "<img src='" + d['json'][i]['message'] + "' width='250' height='200'>"
                                         } else if (d['json'][i]['message_type'] === 'video') {
                                             var message_data = "<video width='320' height='240' controls><source src='" + d['json'][i]['message'] + "' type='video/mp4'></video>"
                                         }
@@ -875,13 +875,13 @@
                 if (data.sender_user_id.toString() === user) {
                     sleep(0).then(() => {
                         $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                            data.sender_user + "</div><img src='" + data.message + "'><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                            data.sender_user + "</div><img src='" + data.message + "' width='250' height='200'><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
                             formatted + "</p></div></div></li>")
                     })
                 } else {
                     sleep(10).then(() => {
                         $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                            data.sender_user + "</div><img src='" + data.message + "'><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                            data.sender_user + "</div><img src='" + data.message + "' width='250' height='200'><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
                             formatted + "</p></div></div></li>")
                     })
                 }
@@ -1042,7 +1042,7 @@
                         if (response['json'][i]['message_type'] === 'text') {
                             var message_data = "<p>" + response['json'][i]['message'] + "</p>"
                         } else if (response['json'][i]['message_type'] === 'image') {
-                            var message_data = "<img src='" + response['json'][i]['message'] + "'>"
+                            var message_data = "<img src='" + response['json'][i]['message'] + "' width='250' height='200'>"
                         } else if (response['json'][i]['message_type'] === 'video') {
                             var message_data = "<video width='320' height='240' controls><source src='" + response['json'][i]['message'] + "' type='video/mp4'></video>"
                         }
