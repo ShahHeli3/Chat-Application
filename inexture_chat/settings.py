@@ -38,6 +38,7 @@ AUTH_USER_MODEL = 'users.CustomUser'
 # Application definition
 
 CORS_ORIGIN_ALLOW_ALL = True
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
 INSTALLED_APPS = [
     'channels',
