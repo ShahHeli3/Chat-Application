@@ -870,7 +870,7 @@
                         formatted + "</p></div></div></li>")
                 }
             }
-            {# if the messsage is an image file #}
+                {# if the messsage is an image file #}
             else if (data.message_type === 'image') {
                 if (data.sender_user_id.toString() === user) {
                     sleep(0).then(() => {
@@ -886,7 +886,7 @@
                     })
                 }
             }
-            {# if the messsage is an video file #}
+                {# if the messsage is an video file #}
             else if (data.message_type === 'video') {
                 if (data.sender_user_id.toString() === user) {
                     sleep(0).then(() => {
@@ -1037,16 +1037,27 @@
                     var sender_user_id = response['sender_user_id']
 
                     for (let i = 0; i < response['json'].length; i++) {
+
+
+                        if (response['json'][i]['message_type'] === 'text') {
+                            var message_data = "<p>" + response['json'][i]['message'] + "</p>"
+                        } else if (response['json'][i]['message_type'] === 'image') {
+                            var message_data = "<img src='" + response['json'][i]['message'] + "'>"
+                        } else if (response['json'][i]['message_type'] === 'video') {
+                            var message_data = "<video width='320' height='240' controls><source src='" + response['json'][i]['message'] + "' type='video/mp4'></video>"
+                        }
+
+
                         if (sender_user_id === response['json'][i]['sender_user']) {
                             $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                                response['json'][i]['full_name'] + "</div><p>" + response['json'][i]['message'] +
-                                "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                                response['json'][i]['full_name'] + "</div>" + message_data +
+                                "<p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
                                 response['json'][i]['timestamp'] + "</p></div></div></li>")
 
                         } else {
                             $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                                response['json'][i]['full_name'] + "</div><p>" + response['json'][i]['message'] +
-                                "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                                response['json'][i]['full_name'] + "</div>" + message_data +
+                                "<p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
                                 response['json'][i]['timestamp'] + "</p></div></div></li>")
                         }
                     }
