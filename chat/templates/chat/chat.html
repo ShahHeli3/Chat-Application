@@ -429,7 +429,7 @@
                                                         <li class="list-inline-item" id="send-video-file">
                                                             <a href="javascript: void(0);" title="Add Videos">
                                                                 <i class="mdi mdi-file-video-outline"></i></a></li>
-                                                        <li class="list-inline-item">
+                                                        <li class="list-inline-item" id="send-doc-file">
                                                             <a href="javascript: void(0);" title="Add Files">
                                                                 <i class="mdi mdi-file-document-outline"></i></a></li>
                                                     </ul>
@@ -545,6 +545,7 @@
 
 
 <script>
+    $.cloudinary.config({cloud_name: 'dhhzjlge9', api_key: '675879341691844'});
 
     var availableUsers = [];
     var availableGroups = [];
@@ -688,6 +689,8 @@
                                             var message_data = "<img src='" + d['json'][i]['message'] + "' width='250' height='200'>"
                                         } else if (d['json'][i]['message_type'] === 'video') {
                                             var message_data = "<video width='320' height='240' controls><source src='" + d['json'][i]['message'] + "' type='video/mp4'></video>"
+                                        } else if (d['json'][i]['message_type'] === 'file') {
+                                            var message_data = "<h6><b>File : </b><a href='" + d['json'][i]['message'] + "'>Download File</a></h6>"
                                         }
 
                                         if (receiver_user === d['json'][i]['username']) {
@@ -788,17 +791,16 @@
         };
 
         document.querySelector('#send-image-file').onclick = function (e) {
-            $.cloudinary.config({cloud_name: 'dhhzjlge9', api_key: '675879341691844'});
             cloudinary.openUploadWidget({
                     cloud_name: 'dhhzjlge9',
                     upload_preset: 'g5lmd3i3',
-                    tags: ['cgal']
+                    multiple: false,
                 },
                 function (error, result) {
                     if (error) console.log(error);
                     // If NO error, log image data to console
 
-                    if (result[0].format !== 'jpg' && result[0].format !== 'png') {
+                    if (result[0].resource_type !== 'image') {
                         Swal.fire({
                             title: 'Invalid image format',
                             confirmButtonText: 'OK',
@@ -817,17 +819,16 @@
         }
 
         document.querySelector('#send-video-file').onclick = function (e) {
-            $.cloudinary.config({cloud_name: 'dhhzjlge9', api_key: '675879341691844'});
             cloudinary.openUploadWidget({
                     cloud_name: 'dhhzjlge9',
                     upload_preset: 'y4rx3bp1',
-                    tags: ['cgal']
+                    multiple: false,
                 },
                 function (error, result) {
                     if (error) console.log(error);
                     // If NO error, log image data to console
 
-                    if (result[0].format !== 'mp4') {
+                    if (result[0].resource_type !== 'video') {
                         Swal.fire({
                             title: 'Invalid video format',
                             confirmButtonText: 'OK',
@@ -845,6 +846,34 @@
             )
 
         }
+
+        document.querySelector('#send-doc-file').onclick = function (e) {
+            cloudinary.openUploadWidget({
+                    cloud_name: 'dhhzjlge9',
+                    upload_preset: 'ghritkgd',
+                    multiple: false,
+                },
+                function (error, result) {
+                    if (error) console.log(error);
+                    // If NO error, log image data to console
+
+                    if (result[0].resource_type !== 'raw') {
+                        Swal.fire({
+                            title: 'Invalid file format',
+                            confirmButtonText: 'OK',
+                        })
+                    } else {
+                        var url = result[0].secure_url
+                        chatSocket.send(JSON.stringify({
+                            'message': url,
+                            'sender_user': sender_user,
+                            'sender_user_id': sender_user_id,
+                            'message_type': 'file'
+                        }));
+                    }
+                }
+            )
+        }
     }
 
     function sleep(ms) {
@@ -857,51 +886,27 @@
 
             var formatted = getDateTime()
 
-            {#if the message is text#}
+
             if (data.message_type === 'text') {
-                if (data.sender_user_id.toString() === user) {
-                    $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                        data.sender_user + "</div><p>" + data.message + "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
-                        formatted + "</p></div></div></li>")
-                } else {
-                    $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                        data.sender_user + "</div><p>" + data.message +
-                        "</p><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
-                        formatted + "</p></div></div></li>")
-                }
+                var message_data = "<p>" + data.message + "</p>"
+            } else if (data.message_type === 'image') {
+                var message_data = "<img src='" + data.message + "' width='250' height='200'>"
+            } else if (data.message_type === 'video') {
+                var message_data = "<video width='320' height='240' controls><source src='" + data.message + "' type='video/mp4'></video>"
+            } else if (data.message_type === 'file') {
+                var message_data = "<h6><b>File : </b><a href='" + data.message + "'>Download File</a></h6>"
             }
-                {# if the messsage is an image file #}
-            else if (data.message_type === 'image') {
-                if (data.sender_user_id.toString() === user) {
-                    sleep(0).then(() => {
-                        $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                            data.sender_user + "</div><img src='" + data.message + "' width='250' height='200'><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
-                            formatted + "</p></div></div></li>")
-                    })
-                } else {
-                    sleep(1000).then(() => {
-                        $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                            data.sender_user + "</div><img src='" + data.message + "' width='250' height='200'><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
-                            formatted + "</p></div></div></li>")
-                    })
-                }
+
+            if (data.sender_user_id.toString() === user) {
+                $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                    data.sender_user + "</div>" + message_data + "<p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                    formatted + "</p></div></div></li>")
+            } else {
+                $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                    data.sender_user + "</div>" + message_data + "<p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
+                    formatted + "</p></div></div></li>")
             }
-                {# if the messsage is an video file #}
-            else if (data.message_type === 'video') {
-                if (data.sender_user_id.toString() === user) {
-                    sleep(0).then(() => {
-                        $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                            data.sender_user + "</div><video width='320' height='240' controls><source src='" + data.message + "' type='video/mp4'></video><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
-                            formatted + "</p></div></div></li>")
-                    })
-                } else {
-                    sleep(10).then(() => {
-                        $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
-                            data.sender_user + "</div><video width='320' height='240' controls><source src='" + data.message + "' type='video/mp4'></video><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
-                            formatted + "</p></div></div></li>")
-                    })
-                }
-            }
+
             $("#chat-log").scrollTop($("#chat-log")[0].scrollHeight);
         }
     }
@@ -963,11 +968,10 @@
     var imageID = ''
 
     function addImage() {
-        $.cloudinary.config({cloud_name: 'dhhzjlge9', api_key: '675879341691844'});
         cloudinary.openUploadWidget({
                 cloud_name: 'dhhzjlge9',
                 upload_preset: 'ygrmgnvy',
-                tags: ['cgal']
+                multiple: false,
             },
             function (error, result) {
                 if (error) console.log(error);
@@ -1045,6 +1049,8 @@
                             var message_data = "<img src='" + response['json'][i]['message'] + "' width='250' height='200'>"
                         } else if (response['json'][i]['message_type'] === 'video') {
                             var message_data = "<video width='320' height='240' controls><source src='" + response['json'][i]['message'] + "' type='video/mp4'></video>"
+                        } else if (response['json'][i]['message_type'] === 'file') {
+                            var message_data = "<h6><b>File : </b><a href='" + response['json'][i]['message'] + "'>Download File</a></h6>"
                         }
 
 
@@ -1187,11 +1193,10 @@
     }
 
     function changeGroupIcon() {
-        $.cloudinary.config({cloud_name: 'dhhzjlge9', api_key: '675879341691844'});
         cloudinary.openUploadWidget({
                 cloud_name: 'dhhzjlge9',
                 upload_preset: 'ygrmgnvy',
-                tags: ['cgal']
+                multiple: false,
             },
             function (error, result) {
                 if (error) console.log(error);
