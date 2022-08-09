@@ -879,7 +879,7 @@
                             formatted + "</p></div></div></li>")
                     })
                 } else {
-                    sleep(10).then(() => {
+                    sleep(1000).then(() => {
                         $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
                             data.sender_user + "</div><img src='" + data.message + "' width='250' height='200'><p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
                             formatted + "</p></div></div></li>")
