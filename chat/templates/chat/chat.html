@@ -1076,20 +1076,20 @@
 
         document.getElementById('change-group-name').value = document.getElementById('receiver_name').innerText
 
-        if (document.getElementById('left-bar-group-info').style.display === 'none') {
-            $.ajax({
-                method: "GET",
-                url: "/get_group_members",
-                data: {
-                    'room': roomName
-                },
-                success: function (response) {
-                    for (let i = 0; i < response.length; i++) {
-                        $('#group-participants').append('<h6 class="font-size-12 mt-2">' + response[i] + '</h6>')
-                    }
+        $.ajax({
+            method: "GET",
+            url: "/get_group_members",
+            data: {
+                'room': roomName
+            },
+            success: function (response) {
+                document.getElementById('group-participants').innerHTML = ''
+                for (let i = 0; i < response.length; i++) {
+                    $('#group-participants').append('<h6 class="font-size-12 mt-2">' + response[i] + '</h6>')
                 }
-            })
-        }
+            }
+        })
+
 
         document.getElementById('left-bar-create-group').style.display = 'none'
         document.getElementById('left-bar').style.display = 'none'
