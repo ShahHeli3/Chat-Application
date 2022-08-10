@@ -552,13 +552,8 @@
     var allGroups = [];
     var user = '{{ user.id }}'
 
-    $('#group-chat').click(function () {
-        document.getElementById('searchuser').style.display = 'none'
-        document.getElementById('search-group').style.display = 'block'
 
-        document.getElementById('btn-chat').style.display = 'none'
-        document.getElementById('btn-open-group').style.display = 'block'
-
+    $('#search-group').click(function () {
         $.ajax({
             method: "GET",
             url: "/get_all_groups",
@@ -573,6 +568,15 @@
                 source: availableGroups
             });
         }
+    })
+
+
+    $('#group-chat').click(function () {
+        document.getElementById('searchuser').style.display = 'none'
+        document.getElementById('search-group').style.display = 'block'
+
+        document.getElementById('btn-chat').style.display = 'none'
+        document.getElementById('btn-open-group').style.display = 'block'
     })
 
     $('#chat-bar').click(function () {
@@ -606,12 +610,14 @@
         }
     })
 
-    $.ajax({
-        method: "GET",
-        url: "/get_all_users",
-        success: function (response) {
-            startAutoComplete(response)
-        }
+    $('#searchuser').click(function () {
+        $.ajax({
+            method: "GET",
+            url: "/get_all_users",
+            success: function (response) {
+                startAutoComplete(response)
+            }
+        })
     })
 
     function getCookie(name) {

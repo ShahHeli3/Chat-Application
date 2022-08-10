@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -9,7 +10,7 @@ from chat.serializer import GetAllMessagesSerializer
 from users.models import CustomUser
 
 
-class HomeView(View):
+class HomeView(LoginRequiredMixin, View):
     def get(self, request):
         """
         function to load all users, the logged-in user's rooms and send it to frontend
