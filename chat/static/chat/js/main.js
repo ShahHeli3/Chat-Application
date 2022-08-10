@@ -156,9 +156,9 @@ function updateMessage(receiver) {
                                     if (d['json'][i]['message_type'] === 'text') {
                                         var message_data = "<p>" + d['json'][i]['message'] + "</p>"
                                     } else if (d['json'][i]['message_type'] === 'image') {
-                                        var message_data = "<a href='" + d['json'][i]['message'] + "' target='_blank'><img src='" + d['json'][i]['message'] + "' width='300' height='200'></a>"
+                                        var message_data = "<a href='" + d['json'][i]['message'] + "' target='_blank'><img src='" + d['json'][i]['message'] + "' width='250' height='200'></a>"
                                     } else if (d['json'][i]['message_type'] === 'video') {
-                                        var message_data = "<video width='300' height='200' controls><source src='" + d['json'][i]['message'] + "' type='video/mp4'></video>"
+                                        var message_data = "<video width='250' height='200' controls><source src='" + d['json'][i]['message'] + "' type='video/mp4'></video>"
                                     } else if (d['json'][i]['message_type'] === 'file') {
                                         var message_data = "<h6><b>File : </b><a href='" + d['json'][i]['message'] + "' target='_blank'>Download File</a></h6>"
                                     } else if (d['json'][i]['message_type'] === 'audio') {
@@ -386,9 +386,9 @@ function displayMessage(chatSocket) {
         if (data.message_type === 'text') {
             var message_data = "<p>" + data.message + "</p>"
         } else if (data.message_type === 'image') {
-            var message_data = "<a href='" + data.message + "' target='_blank'><img src='" + data.message + "' width='300' height='200'></a>"
+            var message_data = "<a href='" + data.message + "' target='_blank'><img src='" + data.message + "' width='250' height='200'></a>"
         } else if (data.message_type === 'video') {
-            var message_data = "<video width='300' height='200' controls><source src='" + data.message + "' type='video/mp4'></video>"
+            var message_data = "<video width='250' height='200' controls><source src='" + data.message + "' type='video/mp4'></video>"
         } else if (data.message_type === 'file') {
             var message_data = "<h6><b>File : </b><a href='" + data.message + "' target='_blank'>Download File</a></h6>"
         } else if (data.message_type === 'audio') {
@@ -537,9 +537,9 @@ function updateGroupChat(room, group) {
                     if (response['json'][i]['message_type'] === 'text') {
                         var message_data = "<p>" + response['json'][i]['message'] + "</p>"
                     } else if (response['json'][i]['message_type'] === 'image') {
-                        var message_data = "<a href='" + response['json'][i]['message'] + "' target='_blank'><img src='" + response['json'][i]['message'] + "' width='300' height='200'></a>"
+                        var message_data = "<a href='" + response['json'][i]['message'] + "' target='_blank'><img src='" + response['json'][i]['message'] + "' width='250' height='200'></a>"
                     } else if (response['json'][i]['message_type'] === 'video') {
-                        var message_data = "<video width='300' height='200' controls><source src='" + response['json'][i]['message'] + "' type='video/mp4'></video>"
+                        var message_data = "<video width='250' height='200' controls><source src='" + response['json'][i]['message'] + "' type='video/mp4'></video>"
                     } else if (response['json'][i]['message_type'] === 'file') {
                         var message_data = "<h6><b>File : </b><a href='" + response['json'][i]['message'] + "' target='_blank'>Download File</a></h6>"
                     } else if (response['json'][i]['message_type'] === 'audio') {
