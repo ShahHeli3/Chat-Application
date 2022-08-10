@@ -24,6 +24,9 @@ class HomeView(LoginRequiredMixin, View):
 
 
 class GetCurrentUserView(View):
+    """
+    to get the logged-in user in js
+    """
     def get(self, request):
         print(request.user.id, type(request.user.id))
         return JsonResponse({'user': request.user.id})

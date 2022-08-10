@@ -1,3 +1,4 @@
+//configure cloudinary for file uploads
 $.cloudinary.config({cloud_name: 'dhhzjlge9', api_key: '675879341691844'});
 
 var allGroups = [];
@@ -10,7 +11,7 @@ var availableMembers = [];
 var addMembersList = [];
 var user = 0
 
-
+//to get current logged-in user
 $.ajax({
     method: "GET",
     url: '/get_current_user',
@@ -159,7 +160,9 @@ function updateMessage(receiver) {
                                     } else if (d['json'][i]['message_type'] === 'video') {
                                         var message_data = "<video width='300' height='200' controls><source src='" + d['json'][i]['message'] + "' type='video/mp4'></video>"
                                     } else if (d['json'][i]['message_type'] === 'file') {
-                                        var message_data = "<h6><b>File : </b><a href='" + d['json'][i]['message'] + "'>Download File</a></h6>"
+                                        var message_data = "<h6><b>File : </b><a href='" + d['json'][i]['message'] + "' target='_blank'>Download File</a></h6>"
+                                    } else if (d['json'][i]['message_type'] === 'audio') {
+                                        var message_data = "<h6><b>File : </b><a href='" + d['json'][i]['message'] + "' target='_blank'>Download Audio</a></h6>"
                                     }
 
                                     if (receiver_user === d['json'][i]['username']) {
@@ -265,7 +268,7 @@ function chat(roomName, sender_user, sender_user_id) {
 
                 if (result[0].resource_type !== 'image') {
                     Swal.fire({
-                        title: 'Invalid image format',
+                        title: 'Invalid image file',
                         confirmButtonText: 'OK',
                     })
                 } else {
@@ -293,7 +296,7 @@ function chat(roomName, sender_user, sender_user_id) {
 
                 if (result[0].resource_type !== 'video') {
                     Swal.fire({
-                        title: 'Invalid video format',
+                        title: 'Invalid video file',
                         confirmButtonText: 'OK',
                     })
                 } else {
@@ -337,6 +340,36 @@ function chat(roomName, sender_user, sender_user_id) {
             }
         )
     }
+
+    document.querySelector('#send-audio-file').onclick = function (e) {
+        cloudinary.openUploadWidget({
+                cloud_name: 'dhhzjlge9',
+                upload_preset: 'icdoj041',
+                multiple: false,
+            },
+            function (error, result) {
+                if (error) console.log(error);
+                // If NO error, log image data to console
+                var file_format = result[0].format
+
+                if( file_format !== 'aac' && file_format !== 'aiff' && file_format !== 'm4a' && file_format !== 'mp3' &&
+                    file_format !== 'ogg' && file_format !== 'wav'){
+                    Swal.fire({
+                        title: 'Invalid audio file',
+                        confirmButtonText: 'OK',
+                    })
+                } else {
+                    url = result[0].secure_url
+                    chatSocket.send(JSON.stringify({
+                        'message': url,
+                        'sender_user': sender_user,
+                        'sender_user_id': sender_user_id,
+                        'message_type': 'audio'
+                    }));
+                }
+            }
+        )
+    }
 }
 
 function sleep(ms) {
@@ -357,7 +390,9 @@ function displayMessage(chatSocket) {
         } else if (data.message_type === 'video') {
             var message_data = "<video width='300' height='200' controls><source src='" + data.message + "' type='video/mp4'></video>"
         } else if (data.message_type === 'file') {
-            var message_data = "<h6><b>File : </b><a href='" + data.message + "'>Download File</a></h6>"
+            var message_data = "<h6><b>File : </b><a href='" + data.message + "' target='_blank'>Download File</a></h6>"
+        } else if (data.message_type === 'audio') {
+            var message_data = "<h6><b>File : </b><a href='" + data.message + "' target='_blank'>Download Audio</a></h6>"
         }
 
         if (data.sender_user_id === user) {
@@ -506,9 +541,10 @@ function updateGroupChat(room, group) {
                     } else if (response['json'][i]['message_type'] === 'video') {
                         var message_data = "<video width='300' height='200' controls><source src='" + response['json'][i]['message'] + "' type='video/mp4'></video>"
                     } else if (response['json'][i]['message_type'] === 'file') {
-                        var message_data = "<h6><b>File : </b><a href='" + response['json'][i]['message'] + "'>Download File</a></h6>"
+                        var message_data = "<h6><b>File : </b><a href='" + response['json'][i]['message'] + "' target='_blank'>Download File</a></h6>"
+                    } else if (response['json'][i]['message_type'] === 'audio') {
+                        var message_data = "<h6><b>File : </b><a href='" + response['json'][i]['message'] + "' target='_blank'>Download Audio</a></h6>"
                     }
-
 
                     if (sender_user_id === response['json'][i]['sender_user']) {
                         $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
