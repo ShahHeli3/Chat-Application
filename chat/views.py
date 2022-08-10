@@ -23,6 +23,12 @@ class HomeView(LoginRequiredMixin, View):
         return render(request, 'chat/chat.html', context=context)
 
 
+class GetCurrentUserView(View):
+    def get(self, request):
+        print(request.user.id, type(request.user.id))
+        return JsonResponse({'user': request.user.id})
+
+
 class GetAllUsersView(View):
     def get(self, request):
         """

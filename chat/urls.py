@@ -1,10 +1,11 @@
 from django.urls import path
 from .views import HomeView, GetAllUsersView, GetAllGroupsView, RoomsView, GetAllMessagesView, GetUsersForGroupView, \
     CreateGroupView, GetGroupMessagesView, GetRoomNameView, ChangeGroupNameView, UpdateGroupIconView, ExitGroupView, \
-    GetGroupMembersView, GetUsersExceptGroupMembersView, AddGroupMembersView
+    GetGroupMembersView, GetUsersExceptGroupMembersView, AddGroupMembersView, GetCurrentUserView
 
 urlpatterns = [
     path('chat', HomeView.as_view(), name='chat'),
+    path('get_current_user', GetCurrentUserView.as_view(), name='get_current_user'),
     path('get_all_users', GetAllUsersView.as_view(), name='get_all_users'),
     path('get_all_groups', GetAllGroupsView.as_view(), name='get_all_groups'),
     path('get_or_create_room', RoomsView.as_view(), name='get_or_create_room'),
