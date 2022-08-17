@@ -166,12 +166,23 @@ function updateMessage(receiver) {
                                     }
 
                                     if (receiver_user === d['json'][i]['username']) {
-                                        $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                                        $("#chat-messages").append("<li><div class='conversation-list'>" +
+                                            "<div class='dropdown'><a class='dropdown-toggle' href='#' role='button' data-bs-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>\n" +
+                                            "<i class='bx bx-dots-vertical-rounded'></i>\n</a><div class='dropdown-menu'>\n" +
+                                            "<a class=\"dropdown-item\" href=\"#\">Delete</a>\n" +
+                                            "</div></div>" +
+                                            "<div class='ctext-wrap'><div class='conversation-name'>" +
                                             d['json'][i]['full_name'] + "</div>" + message_data +
                                             "<p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
                                             d['json'][i]['timestamp'] + "</p></div></div></li>")
                                     } else {
-                                        $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                                        $("#chat-messages").append("<li class='right'><div class='conversation-list'>" +
+                                            "<div class='dropdown'><a class='dropdown-toggle' href='#' role='button' data-bs-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>\n" +
+                                            "<i class='bx bx-dots-vertical-rounded'></i>\n</a><div class='dropdown-menu'>\n" +
+                                            "<a class=\"dropdown-item\" href=\"#\">Info</a>\n" +
+                                            "<a class=\"dropdown-item\" href=\"#\">Delete</a>\n" +
+                                            "</div></div>" +
+                                            "<div class='ctext-wrap'><div class='conversation-name'>" +
                                             d['json'][i]['full_name'] + "</div>" + message_data +
                                             "<p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
                                             d['json'][i]['timestamp'] + "</p></div></div></li>")
@@ -352,8 +363,8 @@ function chat(roomName, sender_user, sender_user_id) {
                 // If NO error, log image data to console
                 var file_format = result[0].format
 
-                if( file_format !== 'aac' && file_format !== 'aiff' && file_format !== 'm4a' && file_format !== 'mp3' &&
-                    file_format !== 'ogg' && file_format !== 'wav'){
+                if (file_format !== 'aac' && file_format !== 'aiff' && file_format !== 'm4a' && file_format !== 'mp3' &&
+                    file_format !== 'ogg' && file_format !== 'wav') {
                     Swal.fire({
                         title: 'Invalid audio file',
                         confirmButtonText: 'OK',
@@ -396,11 +407,22 @@ function displayMessage(chatSocket) {
         }
 
         if (data.sender_user_id === user) {
-            $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+            $("#chat-messages").append("<li class='right'><div class='conversation-list'>" +
+                "<div class='dropdown'><a class='dropdown-toggle' href='#' role='button' data-bs-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>\n" +
+                "<i class='bx bx-dots-vertical-rounded'></i>\n</a><div class='dropdown-menu'>\n" +
+                "<a class=\"dropdown-item\" href=\"#\">Info</a>\n" +
+                "<a class=\"dropdown-item\" href=\"#\">Delete</a>\n" +
+                "</div></div>" +
+                "<div class='ctext-wrap'><div class='conversation-name'>" +
                 data.sender_user + "</div>" + message_data + "<p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
                 formatted + "</p></div></div></li>")
         } else {
-            $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+            $("#chat-messages").append("<li><div class='conversation-list'>" +
+                "<div class='dropdown'><a class='dropdown-toggle' href='#' role='button' data-bs-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>\n" +
+                "<i class='bx bx-dots-vertical-rounded'></i>\n</a><div class='dropdown-menu'>\n" +
+                "<a class=\"dropdown-item\" href=\"#\">Delete</a>\n" +
+                "</div></div>" +
+                "<div class='ctext-wrap'><div class='conversation-name'>" +
                 data.sender_user + "</div>" + message_data + "<p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
                 formatted + "</p></div></div></li>")
         }
@@ -547,13 +569,24 @@ function updateGroupChat(room, group) {
                     }
 
                     if (sender_user_id === response['json'][i]['sender_user']) {
-                        $("#chat-messages").append("<li class='right'><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                        $("#chat-messages").append("<li class='right'><div class='conversation-list'>" +
+                            "<div class='dropdown'><a class='dropdown-toggle' href='#' role='button' data-bs-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>\n" +
+                            "<i class='bx bx-dots-vertical-rounded'></i>\n</a><div class='dropdown-menu'>\n" +
+                            "<a class=\"dropdown-item\" href=\"#\">Info</a>\n" +
+                            "<a class=\"dropdown-item\" href=\"#\">Delete</a>\n" +
+                            "</div></div>" +
+                            "<div class='ctext-wrap'><div class='conversation-name'>" +
                             response['json'][i]['full_name'] + "</div>" + message_data +
                             "<p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
                             response['json'][i]['timestamp'] + "</p></div></div></li>")
 
                     } else {
-                        $("#chat-messages").append("<li><div class='conversation-list'><div class='ctext-wrap'><div class='conversation-name'>" +
+                        $("#chat-messages").append("<li><div class='conversation-list'>" +
+                            "<div class='dropdown'><a class='dropdown-toggle' href='#' role='button' data-bs-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>\n" +
+                            "<i class='bx bx-dots-vertical-rounded'></i>\n</a><div class='dropdown-menu'>\n" +
+                            "<a class=\"dropdown-item\" href=\"#\">Delete</a>\n" +
+                            "</div></div>" +
+                            "<div class='ctext-wrap'><div class='conversation-name'>" +
                             response['json'][i]['full_name'] + "</div>" + message_data +
                             "<p class='chat-time mb-0'><i class='bx bx-time-five align-middle me-1'></i>" +
                             response['json'][i]['timestamp'] + "</p></div></div></li>")
