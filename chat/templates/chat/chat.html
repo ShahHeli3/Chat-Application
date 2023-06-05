@@ -1,5 +1,4 @@
 {% load static %}
-<!doctype html>
 <html lang="en">
 
 
@@ -55,16 +54,18 @@
                             <div class="py-4 border-bottom">
                                 <div class="d-flex">
                                     <div class="flex-shrink-0 align-self-center me-3">
-                                        <img src="{{ user.profile_image.url }}"
-                                             class="avatar-xs rounded-circle"
-                                             alt="">
+                                        <a href="{{ user.profile_image.url }}" target="_blank">
+                                            <img src="{{ user.profile_image.url }}"
+                                                 class="avatar-xs rounded-circle"
+                                                 alt="profile-photo">
+                                        </a>
                                     </div>
                                     <div class="flex-grow-1">
                                         <h5 class="font-size-20 mt-2">{{ user.full_name }}</h5>
                                     </div>
 
                                     <div>
-                                        <div class="dropdown chat-noti-dropdown active">
+                                        <div class="dropdown chat-noti-dropdown">
                                             <button class="btn" type="button" data-bs-toggle="dropdown"
                                                     aria-haspopup="true" aria-expanded="false">
                                                 <i class="fas fa-bars"></i>
@@ -85,7 +86,7 @@
                                 {% csrf_token %}
                                 <div id="search-bar-message"></div>
                                 <div class="search-box chat-search-box py-4" style="display: flex">
-                                    <div class="position-relative" style="margin-right: 10px; ">
+                                    <div class="position-relative" style="margin-right: 10px">
                                         <input type="text" class="form-control" placeholder="Search..." id="searchuser"
                                                name="receiver">
                                         <input type="text" class="form-control" placeholder="Search groups..."
@@ -119,56 +120,50 @@
                                                 <span class="d-none d-sm-block">Groups</span>
                                             </a>
                                         </li>
-                                        {#                                        <li class="nav-item">#}
-                                        {#                                            <a href="#contacts" data-bs-toggle="tab" aria-expanded="false"#}
-                                        {#                                               class="nav-link">#}
-                                        {#                                                <i class="bx bx-book-content font-size-20 d-sm-none"></i>#}
-                                        {#                                                <span class="d-none d-sm-block">Contacts</span>#}
-                                        {#                                            </a>#}
-                                        {#                                        </li>#}
                                     </ul>
                                     <div class="tab-content py-4">
                                         <div class="tab-pane show active" id="chat">
                                             <div>
                                                 <h5 class="font-size-14 mb-3">Recent</h5>
-                                                <ul class="list-unstyled chat-list" data-simplebar
+                                                <ul class="list-unstyled chat-list" data-simplebar id="user-chat-list"
                                                     style="max-height: 410px;">
                                                     {% for room in rooms %}
-                                                        {% if room.sender_user == user %}
-                                                            <li class="active"
-                                                                onclick="updateMessage('{{ room.receiver_user.username }}')">
-                                                                {% else %}
-                                                            <li class="active"
-                                                                onclick="updateMessage('{{ room.sender_user.username }}')">
+                                                    {% if room.sender_user == user %}
+                                                    <li class="active"
+                                                        onclick="updateMessage('{{ room.receiver_user.username }}')">
+                                                        {% else %}
+                                                    <li class="active"
+                                                        onclick="updateMessage('{{ room.sender_user.username }}')">
                                                         {% endif %}
 
-                                                    <a href="javascript: void(0);">
-                                                        <div class="d-flex">
-                                                            <div class="flex-shrink-0 align-self-center me-3">
-                                                                {% if room.sender_user == user %}
+                                                        <a href="javascript: void(0);">
+                                                            <div class="d-flex">
+                                                                <div class="flex-shrink-0 align-self-center me-3">
+                                                                    {% if room.sender_user == user %}
                                                                     <img src="{{ room.receiver_user.profile_image.url }}"
                                                                          class="rounded-circle avatar-xs"
                                                                          alt="">
-                                                                {% else %}
+                                                                    {% else %}
                                                                     <img src="{{ room.sender_user.profile_image.url }}"
                                                                          class="rounded-circle avatar-xs"
                                                                          alt="">
-                                                                {% endif %}
-                                                            </div>
+                                                                    {% endif %}
+                                                                </div>
 
-                                                            <div class="flex-grow-1 overflow-hidden">
-                                                                <h5 class="text-truncate font-size-14 mb-1">
-                                                                    {% if room.sender_user == user %}
+                                                                <div class="flex-grow-1 overflow-hidden">
+                                                                    <h5 class="text-truncate font-size-14 mb-1"
+                                                                        id="room-{{room.room.id}}">
+                                                                        {% if room.sender_user == user %}
                                                                         {{ room.receiver_user.first_name }}
                                                                         {{ room.receiver_user.last_name }}
-                                                                    {% else %}
+                                                                        {% else %}
                                                                         {{ room.sender_user.first_name }}
                                                                         {{ room.sender_user.last_name }}
-                                                                    {% endif %}
-                                                                </h5>
+                                                                        {% endif %}
+                                                                    </h5>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    </a>
+                                                        </a>
                                                     </li>
                                                     {% endfor %}
                                                 </ul>
@@ -178,32 +173,33 @@
                                         <div class="tab-pane" id="groups">
                                             <h5 class="font-size-14 mb-3">Groups</h5>
                                             <ul class="list-unstyled chat-list" data-simplebar
-                                                style="max-height: 410px;">
+                                                style="max-height: 410px;" id="user-group-list">
                                                 {% for group in groups %}
-                                                    <li id="{{ group.group.room.id }}"
-                                                        onclick="updateGroupChat('{{ group.group.room }}', '{{ group.group.group_name }}')">
-                                                        <a href="javascript: void(0);">
-                                                            <div class="d-flex align-items-center">
-                                                                <div class="flex-shrink-0 me-3">
-                                                                    <div class="avatar-xs">
-                                                                        <img src="{{ group.group.group_icon.url }}"
-                                                                             class="rounded-circle avatar-xs"
-                                                                             alt="">
-                                                                    </div>
-                                                                </div>
-
-                                                                <div class="flex-grow-1">
-                                                                    <h5 class="font-size-14 mb-0">{{ group.group }}</h5>
+                                                <li id="group {{ group.group.room.id }}"
+                                                    onclick="updateGroupChat('{{ group.group.room }}', '{{ group.group.group_name }}')">
+                                                    <a href="javascript: void(0);">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="flex-shrink-0 me-3">
+                                                                <div class="avatar-xs">
+                                                                    <img src="{{ group.group.group_icon.url }}"
+                                                                         class="rounded-circle avatar-xs"
+                                                                         alt="">
                                                                 </div>
                                                             </div>
-                                                        </a>
-                                                    </li>
+
+                                                            <div class="flex-grow-1">
+                                                                <h5 class="font-size-14 mb-0"
+                                                                    id="room-{{group.group.room.id}}">
+                                                                    {{ group.group }}</h5>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </li>
                                                 {% endfor %}
                                             </ul>
                                         </div>
                                     </div>
                                 </div>
-
                             </form>
                         </div>
 
@@ -277,7 +273,7 @@
                             <div id="group-info-message"></div>
                             <br>
 
-                            <div id="group-name">
+                            <div id="group">
                                 <h5 class="font-size-15 mt-2">Group Name:</h5>
                                 <div class="flex-grow-1">
                                     <input type="text" value="group name" id="change-group-name"
@@ -316,7 +312,7 @@
                                            id="add-group-member" name="">
                                     <i class="bx bx-search-alt search-icon"></i>
                                 </div>
-                                <button id='add-group-member-btn' class="btn" type="button"
+                                <button id='' class="btn" type="button"
                                         onclick="selectGroupMember()"
                                         style="background-color: #556ee6; color: white">Select
                                 </button>
@@ -345,8 +341,10 @@
 
                                     <div class="d-flex">
                                         <div class="flex-shrink-0 align-self-center me-3">
-                                            <img src="" id="receiver-image" class="avatar-xs rounded-circle"
-                                                 alt="Image">
+                                            <a href="" target="_blank" id="receiver-profile-image">
+                                                <img src="" id="receiver-image" class="avatar-xs rounded-circle"
+                                                     alt="Image">
+                                            </a>
                                         </div>
                                         <div class="flex-grow-1">
                                             <h5 class="font-size-15 mt-3" id="receiver_name"></h5>
@@ -413,6 +411,10 @@
                                 </div>
                                 <div class="p-3 chat-input-section">
                                     <div class="row">
+                                        <div style="opacity: 75%;">
+                                            <div class="form-control chat-input" id="chat-message-input-box" style="background: #eef0f6;
+                                            width: 83%; display: none; border-color: lightgrey!important; padding-left: 20px"></div>
+                                        </div>
                                         <div class="col">
                                             <div class="position-relative">
                                                 <input type="text" id="chat-message-input"
@@ -420,9 +422,6 @@
                                                        placeholder="Enter Message...">
                                                 <div class="chat-input-links" id="tooltip-container">
                                                     <ul class="list-inline mb-0">
-{#                                                        <li class="list-inline-item">#}
-{#                                                            <a href="javascript: void(0);" title="Emoji">#}
-{#                                                                <i class="mdi mdi-emoticon-happy-outline"></i></a></li>#}
                                                         <li class="list-inline-item" id="send-image-file">
                                                             <a href="javascript: void(0);" title="Images">
                                                                 <i class="mdi mdi-file-image-outline"></i></a></li>
@@ -457,77 +456,13 @@
 
                 </div>
                 <!-- end row -->
-
             </div> <!-- container-fluid -->
         </div>
         <!-- End Page-content -->
-
-
     </div>
     <!-- end main content-->
-
 </div>
 <!-- END layout-wrapper -->
-
-{#<!-- Right Sidebar -->#}
-{#<div class="right-bar">#}
-{#    <div data-simplebar class="h-100">#}
-{#        <div class="rightbar-title d-flex align-items-center px-3 py-4">#}
-{##}
-{#            <h5 class="m-0 me-2">Settings</h5>#}
-{##}
-{#            <a href="javascript:void(0);" class="right-bar-toggle ms-auto">#}
-{#                <i class="mdi mdi-close noti-icon"></i>#}
-{#            </a>#}
-{#        </div>#}
-{##}
-{#        <!-- Settings -->#}
-{#        <hr class="mt-0"/>#}
-{#        <h6 class="text-center mb-0">Choose Layouts</h6>#}
-{##}
-{#        <div class="p-4">#}
-{#            <div class="mb-2">#}
-{#                <img src="{% static 'chat/images/layouts/layout-1.jpg" class="img-thumbnail" alt="layout images' %}">#}
-{#            </div>#}
-{##}
-{#            <div class="form-check form-switch mb-3">#}
-{#                <input class="form-check-input theme-choice" type="checkbox" id="light-mode-switch" checked>#}
-{#                <label class="form-check-label" for="light-mode-switch">Light Mode</label>#}
-{#            </div>#}
-{##}
-{#            <div class="mb-2">#}
-{#                <img src="{% static 'chat/images/layouts/layout-2.jpg" class="img-thumbnail" alt="layout images' %}">#}
-{#            </div>#}
-{#            <div class="form-check form-switch mb-3">#}
-{#                <input class="form-check-input theme-choice" type="checkbox" id="dark-mode-switch">#}
-{#                <label class="form-check-label" for="dark-mode-switch">Dark Mode</label>#}
-{#            </div>#}
-{##}
-{#            <div class="mb-2">#}
-{#                <img src="{% static 'chat/images/layouts/layout-3.jpg" class="img-thumbnail" alt="layout images' %}">#}
-{#            </div>#}
-{#            <div class="form-check form-switch mb-3">#}
-{#                <input class="form-check-input theme-choice" type="checkbox" id="rtl-mode-switch">#}
-{#                <label class="form-check-label" for="rtl-mode-switch">RTL Mode</label>#}
-{#            </div>#}
-{##}
-{#            <div class="mb-2">#}
-{#                <img src="{% static 'chat/images/layouts/layout-4.jpg" class="img-thumbnail" alt="layout images' %}">#}
-{#            </div>#}
-{#            <div class="form-check form-switch mb-5">#}
-{#                <input class="form-check-input theme-choice" type="checkbox" id="dark-rtl-mode-switch">#}
-{#                <label class="form-check-label" for="dark-rtl-mode-switch">Dark RTL Mode</label>#}
-{#            </div>#}
-{##}
-{##}
-{#        </div>#}
-{##}
-{#    </div> <!-- end slimscroll-menu-->#}
-{#</div>#}
-{#<!-- /Right-bar -->#}
-{##}
-{#<!-- Right bar overlay-->#}
-{#<div class="rightbar-overlay"></div>#}
 
 <!-- JAVASCRIPT -->
 <script src="{% static 'chat/libs/jquery/jquery.min.js' %}"></script>
@@ -536,13 +471,13 @@
 <script src="{% static 'chat/libs/simplebar/simplebar.min.js' %}"></script>
 <script src="{% static 'chat/libs/node-waves/waves.min.js' %}"></script>
 
-
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 <script src='https://cdn.rawgit.com/pguso/jquery-plugin-circliful/master/js/jquery.circliful.min.js'></script>
 <script src='https://cdn.jsdelivr.net/jquery.cloudinary/1.0.18/jquery.cloudinary.js' type='text/javascript'></script>
-<script src="https://widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+<script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.8/dist/sweetalert2.all.min.js"></script>
 
 <script src="{% static 'chat/js/main.js' %}"></script>

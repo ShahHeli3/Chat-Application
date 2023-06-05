@@ -55,3 +55,30 @@ class Message(models.Model):
     message = models.TextField()
     message_type = models.CharField(max_length=100, default='text')
     timestamp = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, default='unseen')
+    is_deleted = models.BooleanField(default=False)
+
+
+class GroupMessage(models.Model):
+    """
+    model for storing group message status
+    """
+    message = models.ForeignKey(Message, on_delete=models.CASCADE)
+    receiver_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    status = models.CharField(max_length=10, default='unseen')
+
+
+class DeletedMessage(models.Model):
+    """
+    model for storing deleted messages for users
+    """
+    message = models.ForeignKey(Message, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    
+    
+class MessageReply(models.Model):
+    """
+    model for storing replied messages 
+    """
+    message = models.ForeignKey(Message, related_name='replied_message', on_delete=models.CASCADE)
+    reply_to = models.ForeignKey(Message, related_name='replied_to_message', on_delete=models.DO_NOTHING)

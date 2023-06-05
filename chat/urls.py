@@ -1,7 +1,9 @@
 from django.urls import path
 from .views import HomeView, GetAllUsersView, GetAllGroupsView, RoomsView, GetAllMessagesView, GetUsersForGroupView, \
     CreateGroupView, GetGroupMessagesView, GetRoomNameView, ChangeGroupNameView, UpdateGroupIconView, ExitGroupView, \
-    GetGroupMembersView, GetUsersExceptGroupMembersView, AddGroupMembersView, GetCurrentUserView
+    GetGroupMembersView, GetUsersExceptGroupMembersView, AddGroupMembersView, GetCurrentUserView, \
+    UpdateMessageStatusView, GetRoomType, UpdateGroupMessageStatusView, GetMessageInfoView, DeleteMessageForUserView, \
+    DeleteMessageForEveryoneView, GetRepliedToMessageInfoView
 
 urlpatterns = [
     path('chat', HomeView.as_view(), name='chat'),
@@ -21,5 +23,12 @@ urlpatterns = [
     path('get_users_except_group_members', GetUsersExceptGroupMembersView.as_view(),
          name='get_users_except_group_members'),
     path('add_group_members', AddGroupMembersView.as_view(), name='add_group_members'),
-
+    path('update_message_status', UpdateMessageStatusView.as_view(), name='update_message_status'),
+    path('get_room_type', GetRoomType.as_view(), name='get_room_type'),
+    path('update_group_message_status', UpdateGroupMessageStatusView.as_view(), name='update_group_message_status'),
+    path('get_message_status', GetMessageInfoView.as_view(), name='get_message_status'),
+    path('delete_message_for_user', DeleteMessageForUserView.as_view(), name='delete_message_for_user'),
+    path('delete_message_for_everyone', DeleteMessageForEveryoneView.as_view(), name='delete_message_for_everyone'),
+    path('ge_replied_to_message_information', GetRepliedToMessageInfoView.as_view(),
+         name='ge_replied_to_message_information'),
 ]

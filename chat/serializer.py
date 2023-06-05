@@ -1,9 +1,12 @@
 from rest_framework import serializers
 
-from chat.models import Message
+from chat.models import Message, MessageReply
 
 
 class GetAllMessagesSerializer(serializers.ModelSerializer):
+    """
+    serializer to get all the messages and its data
+    """
 
     username = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
@@ -20,4 +23,24 @@ class GetAllMessagesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ['room', 'message', 'timestamp', 'username', 'sender_user', 'full_name', 'message_type']
+        fields = ['id', 'room', 'message', 'timestamp', 'username', 'sender_user', 'full_name', 'message_type', 'status']
+
+
+class GetRepliedMessagesSerializer(serializers.ModelSerializer):
+    """
+    serializer to get replied messages and its data
+    """
+    reply_to_message = serializers.SerializerMethodField()
+    reply_to_sender_user = serializers.SerializerMethodField()
+
+    def get_reply_to_message(self, obj):
+        return obj.reply_to.message
+
+    def get_reply_to_sender_user(self, obj):
+        return obj.reply_to.sender_user.full_name
+
+    class Meta:
+        model = MessageReply
+        fields = ['message', 'reply_to', 'reply_to_message', 'reply_to_sender_user']
+
+
