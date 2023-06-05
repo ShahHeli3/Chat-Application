@@ -1,0 +1,27 @@
+{% extends "users/base.html" %}
+{% load crispy_forms_tags%}
+{% block content %}
+	<br>
+	<div class="container">
+		<form method="POST" action="">
+			{% csrf_token %}
+			<fieldset class="form-group">
+				<legend class="border-bottom mb-4">Log In</legend>
+				Username : <input type="text" name="username">
+                <br><br>
+                Password : <input type="password" name="password">
+			</fieldset>
+			<div class="form-group">
+				<button class="btn" type="submit" style="background-color: #343940FF; color: white">
+					Sign In
+				</button>
+			</div>
+		</form>
+		<div class="border-top pt-3">
+			<small class="text-muted">
+				Need an account?
+                <a href="{% url 'register' %}" style="color: #343940FF">Sign Up Now</a>
+			</small>
+		</div>
+	</div>
+{% endblock content %}

@@ -1,0 +1,26 @@
+{% extends "users/base.html" %}
+{% load crispy_forms_filters %}
+{% block content %}
+{% load crispy_forms_tags %}
+	<br>
+	<div class="container">
+		<form method="POST" enctype="multipart/form-data">
+			{% csrf_token %}
+			<fieldset class="form-group">
+				<legend class="border-bottom mb-4">Join Today</legend>
+				{{ form|crispy }}
+			</fieldset>
+			<div class="form-group">
+				<button class="btn" type="submit" style="background-color: #343940FF; color: white">
+					Sign Up
+				</button>
+			</div>
+		</form>
+		<div class="border-top pt-3 mb-3">
+			<small class="text-muted">
+				Already have an account?
+                <a class="ml-2" href="{% url 'login' %}" style="color: #343940FF">Sign In</a>
+			</small>
+		</div>
+	</div>
+{% endblock %}

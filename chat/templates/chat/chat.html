@@ -1,0 +1,488 @@
+{% load static %}
+<html lang="en">
+
+
+<!-- Mirrored from themesbrand.com/skote/layouts/chat.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 26 Aug 2021 05:23:31 GMT -->
+<head>
+
+    <meta charset="utf-8"/>
+    <title>Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description"/>
+    <meta content="Themesbrand" name="author"/>
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="{% static 'chat/images/favicon.ico' %}">
+
+    <!-- Bootstrap Css -->
+    <link href="{% static 'chat/css/bootstrap.min.css' %}" id="bootstrap-style" rel="stylesheet"/>
+    <!-- Icons Css -->
+    <link href="{% static 'chat/css/icons.min.css' %}" rel="stylesheet" type="text/css"/>
+    <!-- App Css-->
+    <link href="{% static 'chat/css/app.min.css' %}" id="app-style" rel="stylesheet"/>
+
+    <style>
+        .ui-widget-content {
+            position: absolute !important;
+            background: #556ee6;
+            color: white;
+            z-index: 1000;
+            list-style: none;
+            border-radius: 5px;
+        }
+
+        .ui-widget-content li {
+            font-size: 15px;
+            padding: 5px 0;
+        }
+    </style>
+</head>
+
+<body data-sidebar="dark">
+
+<!-- <body data-layout="horizontal" data-topbar="dark"> -->
+
+<!-- Begin page -->
+<div id="layout-wrapper">
+
+    <div class="">
+
+        <div class="">
+            <div class="container-fluid">
+                <div class="d-lg-flex">
+                    <div class="chat-leftsidebar me-lg-4">
+                        <div class="" id="left-bar">
+                            <div class="py-4 border-bottom">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0 align-self-center me-3">
+                                        <a href="{{ user.profile_image.url }}" target="_blank">
+                                            <img src="{{ user.profile_image.url }}"
+                                                 class="avatar-xs rounded-circle"
+                                                 alt="profile-photo">
+                                        </a>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h5 class="font-size-20 mt-2">{{ user.full_name }}</h5>
+                                    </div>
+
+                                    <div>
+                                        <div class="dropdown chat-noti-dropdown">
+                                            <button class="btn" type="button" data-bs-toggle="dropdown"
+                                                    aria-haspopup="true" aria-expanded="false">
+                                                <i class="fas fa-bars"></i>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-end">
+                                                <a class="dropdown-item" href="#" id="create-group"
+                                                   onclick="openCreateGroup()">Create Group</a>
+                                                <a class="dropdown-item" href="{% url 'profile' user.id %}">Update
+                                                    Profile</a>
+                                                <a class="dropdown-item" href="logout">Logout</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <form method="post">
+                                {% csrf_token %}
+                                <div id="search-bar-message"></div>
+                                <div class="search-box chat-search-box py-4" style="display: flex">
+                                    <div class="position-relative" style="margin-right: 10px">
+                                        <input type="text" class="form-control" placeholder="Search..." id="searchuser"
+                                               name="receiver">
+                                        <input type="text" class="form-control" placeholder="Search groups..."
+                                               id="search-group" style="display: none">
+                                        <i class="bx bx-search-alt search-icon"></i>
+                                    </div>
+
+                                    <button id='btn-chat' class="btn" type="button"
+                                            style="background-color: #556ee6; color: white">Chat
+                                    </button>
+                                    <button id='btn-open-group' class="btn" type="button"
+                                            style="background-color: #556ee6; color: white; display: none">Open
+                                    </button>
+
+                                </div>
+
+
+                                <div class="chat-leftsidebar-nav">
+                                    <ul class="nav nav-pills nav-justified">
+                                        <li class="nav-item">
+                                            <a href="#chat" data-bs-toggle="tab" aria-expanded="true" id="chat-bar"
+                                               class="nav-link active">
+                                                <i class="bx bx-chat font-size-20 d-sm-none"></i>
+                                                <span class="d-none d-sm-block">Chat</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="#groups" data-bs-toggle="tab" aria-expanded="false" id="group-chat"
+                                               class="nav-link">
+                                                <i class="bx bx-group font-size-20 d-sm-none"></i>
+                                                <span class="d-none d-sm-block">Groups</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content py-4">
+                                        <div class="tab-pane show active" id="chat">
+                                            <div>
+                                                <h5 class="font-size-14 mb-3">Recent</h5>
+                                                <ul class="list-unstyled chat-list" data-simplebar id="user-chat-list"
+                                                    style="max-height: 410px;">
+                                                    {% for room in rooms %}
+                                                    {% if room.sender_user == user %}
+                                                    <li class="active"
+                                                        onclick="updateMessage('{{ room.receiver_user.username }}')">
+                                                        {% else %}
+                                                    <li class="active"
+                                                        onclick="updateMessage('{{ room.sender_user.username }}')">
+                                                        {% endif %}
+
+                                                        <a href="javascript: void(0);">
+                                                            <div class="d-flex">
+                                                                <div class="flex-shrink-0 align-self-center me-3">
+                                                                    {% if room.sender_user == user %}
+                                                                    <img src="{{ room.receiver_user.profile_image.url }}"
+                                                                         class="rounded-circle avatar-xs"
+                                                                         alt="">
+                                                                    {% else %}
+                                                                    <img src="{{ room.sender_user.profile_image.url }}"
+                                                                         class="rounded-circle avatar-xs"
+                                                                         alt="">
+                                                                    {% endif %}
+                                                                </div>
+
+                                                                <div class="flex-grow-1 overflow-hidden">
+                                                                    <h5 class="text-truncate font-size-14 mb-1"
+                                                                        id="room-{{room.room.id}}">
+                                                                        {% if room.sender_user == user %}
+                                                                        {{ room.receiver_user.first_name }}
+                                                                        {{ room.receiver_user.last_name }}
+                                                                        {% else %}
+                                                                        {{ room.sender_user.first_name }}
+                                                                        {{ room.sender_user.last_name }}
+                                                                        {% endif %}
+                                                                    </h5>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane" id="groups">
+                                            <h5 class="font-size-14 mb-3">Groups</h5>
+                                            <ul class="list-unstyled chat-list" data-simplebar
+                                                style="max-height: 410px;" id="user-group-list">
+                                                {% for group in groups %}
+                                                <li id="group {{ group.group.room.id }}"
+                                                    onclick="updateGroupChat('{{ group.group.room }}', '{{ group.group.group_name }}')">
+                                                    <a href="javascript: void(0);">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="flex-shrink-0 me-3">
+                                                                <div class="avatar-xs">
+                                                                    <img src="{{ group.group.group_icon.url }}"
+                                                                         class="rounded-circle avatar-xs"
+                                                                         alt="">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="flex-grow-1">
+                                                                <h5 class="font-size-14 mb-0"
+                                                                    id="room-{{group.group.room.id}}">
+                                                                    {{ group.group }}</h5>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div id="left-bar-create-group" style="display: none">
+                            <div class="py-4 border-bottom">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0 align-self-center me-3">
+                                        <img src="{{ user.profile_image.url }}"
+                                             class="avatar-xs rounded-circle"
+                                             alt="">
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h5 class="font-size-20 mt-2">{{ user.full_name }}</h5>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="pre-group-name-div"></div>
+
+                            <div class="flex-grow-1">
+                                <h5 class="font-size-15 mt-2">Group Name:</h5>
+                            </div>
+                            <div class="search-box group-user-search-box py-4" style="display: flex">
+                                <div class="position-relative">
+                                    <input type="text" class="form-control" placeholder="Enter Group Name"
+                                           id="group-name">
+                                </div>
+                            </div>
+
+                            <div class="flex-grow-1">
+                                <h5 class="font-size-15 mt-2">Add Group Icon</h5>
+                            </div>
+                            <br>
+                            <div id="add-group-icon">
+                                <input type="button" type="button" onclick="addImage()" id="group-icon-id"
+                                       value="Add Image">
+                            </div>
+
+                            <br><br><br>
+                            <div class="flex-grow-1">
+                                <h5 class="font-size-15 mt-2">Add Participants</h5>
+                            </div>
+                            <div id="group-members-list"></div>
+                            <div class="search-box chat-search-box py-4" style="display: flex">
+                                <div class="position-relative" style="margin-right: 10px;">
+                                    <input type="text" class="form-control" placeholder="Enter username"
+                                           id="group-member" name="">
+                                    <i class="bx bx-search-alt search-icon"></i>
+                                </div>
+                                <button id='add-group-member-btn' class="btn" type="button" onclick="allowCreateGroup()"
+                                        style="background-color: #556ee6; color: white">Add
+                                </button>
+                            </div>
+                            <button id='btn-create-group' class="btn" type="button" onclick="createGroup()"
+                                    style="background-color: #556ee6; color: white; margin-left: 100px; display: none">
+                                Create Group
+                            </button>
+
+                            <br><br>
+                            <div>
+                                <button type="button" onclick="leaveCreateGroup()" style="margin-left: 100px"
+                                        class="btn btn-primary btn-rounded chat-send w-md waves-effect waves-light">
+                                    Go Back
+                                </button>
+                            </div>
+
+                        </div>
+
+                        <div id="left-bar-group-info" style="display: none">
+                            <br>
+                            <div id="group-info-message"></div>
+                            <br>
+
+                            <div id="group">
+                                <h5 class="font-size-15 mt-2">Group Name:</h5>
+                                <div class="flex-grow-1">
+                                    <input type="text" value="group name" id="change-group-name"
+                                           style="width: 210px; height: 40px">
+
+                                    <button type="btn" onclick="changeGroupName()"
+                                            class="btn btn-primary btn-rounded chat-send w-md waves-effect waves-light">
+                                        Change Group Name
+                                    </button>
+                                </div>
+                            </div>
+                            <br><br>
+
+                            <div class="flex-grow-1" id="group-icon">
+                                <h5 class="font-size-15 mt-2">Group Icon:</h5>
+                                <input type="button" type="button" id="change-group-icon"
+                                       value="Change Group Icon" onclick="changeGroupIcon()">
+                            </div>
+
+                            <br><br>
+                            <div class="flex-grow-1">
+                                <div id="group-participants">
+                                    <h5 class="font-size-15 mt-2">Participants</h5>
+                                </div>
+
+                            </div>
+
+                            <br><br>
+                            <div id="pre-add-group-members"></div>
+                            <h5 class="font-size-15 mt-2">Add Participants</h5>
+                            <div id="add-group-members-list"></div>
+
+                            <div class="search-box chat-search-box py-4" style="display: flex">
+                                <div class="position-relative" style="margin-right: 10px;">
+                                    <input type="text" class="form-control" placeholder="Enter username"
+                                           id="add-group-member" name="">
+                                    <i class="bx bx-search-alt search-icon"></i>
+                                </div>
+                                <button id='' class="btn" type="button"
+                                        onclick="selectGroupMember()"
+                                        style="background-color: #556ee6; color: white">Select
+                                </button>
+                            </div>
+                            <div>
+                                <button id='add-group-members-btn' class="btn" type="button" onclick="addGroupMembers()"
+                                        style="background-color: #556ee6; color: white; display: none; margin-left: 100px">
+                                    Add Members
+                                </button>
+                            </div>
+
+                            <br><br>
+                            <div>
+                                <button type="button" onclick="leaveGroupInfo()" style="margin-left: 100px"
+                                        class="btn btn-primary btn-rounded chat-send w-md waves-effect waves-light">
+                                    Go Back
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="w-100 user-chat" id="user-chat" style="display: none">
+                        <div class="card">
+                            <div class="p-4 border-bottom ">
+                                <div class="row">
+
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0 align-self-center me-3">
+                                            <a href="" target="_blank" id="receiver-profile-image">
+                                                <img src="" id="receiver-image" class="avatar-xs rounded-circle"
+                                                     alt="Image">
+                                            </a>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <h5 class="font-size-15 mt-3" id="receiver_name"></h5>
+                                        </div>
+
+                                        <div class="col-md-8 col-3">
+                                            <ul class="list-inline user-chat-nav text-end mb-0">
+                                                <li class="list-inline-item d-none d-sm-inline-block">
+                                                    <div class="dropdown">
+                                                        <button class="btn nav-btn dropdown-toggle" type="button"
+                                                                data-bs-toggle="dropdown" aria-haspopup="true"
+                                                                aria-expanded="false">
+                                                            <i class="bx bx-search-alt-2"></i>
+                                                        </button>
+                                                        <div class="dropdown-menu dropdown-menu-end dropdown-menu-md">
+                                                            <form class="p-3">
+                                                                {% csrf_token %}
+                                                                <div class="form-group m-0">
+                                                                    <div class="input-group">
+                                                                        <input type="text" class="form-control"
+                                                                               placeholder="Search ..."
+                                                                               aria-label="Recipient's username">
+
+                                                                        <button class="btn btn-primary" type="submit"><i
+                                                                                class="mdi mdi-magnify"></i></button>
+
+                                                                    </div>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </li>
+
+                                                <li class="list-inline-item">
+                                                    <div class="dropdown" id="more-features" style="display: none">
+                                                        <button class="btn nav-btn dropdown-toggle" type="button"
+                                                                data-bs-toggle="dropdown" aria-haspopup="true"
+                                                                aria-expanded="false">
+                                                            <i class="bx bx-dots-horizontal-rounded"></i>
+                                                        </button>
+                                                        <div class="dropdown-menu dropdown-menu-end">
+                                                            <a class="dropdown-item" href="#" onclick="groupInfo()">Group
+                                                                Info</a>
+                                                            <a class="dropdown-item" href="#" id="showAlert">Exit
+                                                                Group</a>
+                                                        </div>
+                                                    </div>
+                                                </li>
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                            <div>
+                                <div class="chat-conversation p-3" id="chat-log"
+                                     style="overflow-y: auto; max-height: 486px; min-height: 486px">
+                                    <ul class="list-unstyled mb-0" id="chat-messages" data-simplebar
+                                        style="max-height: 486px;">
+                                    </ul>
+                                </div>
+                                <div class="p-3 chat-input-section">
+                                    <div class="row">
+                                        <div style="opacity: 75%;">
+                                            <div class="form-control chat-input" id="chat-message-input-box" style="background: #eef0f6;
+                                            width: 83%; display: none; border-color: lightgrey!important; padding-left: 20px"></div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="position-relative">
+                                                <input type="text" id="chat-message-input"
+                                                       class="form-control chat-input"
+                                                       placeholder="Enter Message...">
+                                                <div class="chat-input-links" id="tooltip-container">
+                                                    <ul class="list-inline mb-0">
+                                                        <li class="list-inline-item" id="send-image-file">
+                                                            <a href="javascript: void(0);" title="Images">
+                                                                <i class="mdi mdi-file-image-outline"></i></a></li>
+                                                        <li class="list-inline-item" id="send-video-file">
+                                                            <a href="javascript: void(0);" title="Videos">
+                                                                <i class="mdi mdi-file-video-outline"></i></a></li>
+                                                        <li class="list-inline-item" id="send-doc-file">
+                                                            <a href="javascript: void(0);" title="Files">
+                                                                <i class="mdi mdi-file-document-outline"></i></a></li>
+                                                        <li class="list-inline-item" id="send-audio-file">
+                                                            <a href="javascript: void(0);" title="Audio">
+                                                                <i class="mdi mdi-microphone-outline"></i></a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <button type="submit" id="chat-message-submit"
+                                                    class="btn btn-primary btn-rounded chat-send w-md waves-effect waves-light">
+                                                <span class="d-none d-sm-inline-block me-2">Send</span> <i
+                                                    class="mdi mdi-send"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="home-image">
+                        <img src="{% static 'chat/images/home_page.jpg' %}" style="width: 100%;height: 100%;">
+                    </div>
+
+                </div>
+                <!-- end row -->
+            </div> <!-- container-fluid -->
+        </div>
+        <!-- End Page-content -->
+    </div>
+    <!-- end main content-->
+</div>
+<!-- END layout-wrapper -->
+
+<!-- JAVASCRIPT -->
+<script src="{% static 'chat/libs/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'chat/libs/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'chat/libs/metismenu/metisMenu.min.js' %}"></script>
+<script src="{% static 'chat/libs/simplebar/simplebar.min.js' %}"></script>
+<script src="{% static 'chat/libs/node-waves/waves.min.js' %}"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+<script src='https://cdn.rawgit.com/pguso/jquery-plugin-circliful/master/js/jquery.circliful.min.js'></script>
+<script src='https://cdn.jsdelivr.net/jquery.cloudinary/1.0.18/jquery.cloudinary.js' type='text/javascript'></script>
+<script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.8/dist/sweetalert2.all.min.js"></script>
+
+<script src="{% static 'chat/js/main.js' %}"></script>
+
+</body>
+
+<!-- Mirrored from themesbrand.com/skote/layouts/chat.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 26 Aug 2021 05:23:31 GMT -->
+</html>
